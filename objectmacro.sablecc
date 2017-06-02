@@ -83,9 +83,10 @@ Helpers
   string_escape = '\' [['\' + '$'] + ['"' + 'n']];
 
   lowercase = ['a'..'z'];
+  uppercase = ['A' .. 'Z'];
   digit = ['0'..'9'];
 
-  normal_part = lowercase (lowercase | digit)*;
+  normal_part = lowercase (lowercase | digit | uppercase)*;
   normal_identifier = normal_part ('_' normal_part)*;
 
   rich_identifier = '<' [ascii_id_start - '_'] [ascii_id_continue - '_']* '>';
@@ -195,7 +196,6 @@ Productions
 
     macro_body_parts =
         {insert} l_brace insert_kw colon macro_reference r_brace |
-        {params} l_brace identifier r_brace |
         {var} variable |
         {text} text_char |
         {eol} eol |

@@ -64,7 +64,7 @@ Macro private_method
 Macro method
     Params
         name : String;
-        returntype : String, none="void";
+        returnType : String, none="void";
         parameters : parameter, separator=",";
     Context
         indent : String;
