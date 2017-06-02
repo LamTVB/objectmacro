@@ -1,0 +1,262 @@
+/* This file is part of SableCC ( http://sablecc.org ).
+ *
+ * See the NOTICE file distributed with this work for copyright information.
+ *
+ * Licensed under the Apache License, Version 2.0 (the "License");
+ * you may not use this file except in compliance with the License.
+ * You may obtain a copy of the License at
+ *
+ *     http://www.apache.org/licenses/LICENSE-2.0
+ *
+ * Unless required by applicable law or agreed to in writing, software
+ * distributed under the License is distributed on an "AS IS" BASIS,
+ * WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ * See the License for the specific language governing permissions and
+ * limitations under the License.
+ */
+
+Package org.sablecc.objectmacro.syntax3;
+
+Helpers
+
+  // Based on Unicode 5.1.0
+
+  ascii_lu = [0x0041 .. 0x005A];
+  ascii_ll = [0x0061 .. 0x007A];
+
+  ascii_l = [ascii_lu + ascii_ll];
+
+  ascii_nd = [0x0030 .. 0x0039];
+
+  ascii_n = ascii_nd;
+
+  ascii_pc = 0x005F;
+  ascii_pd = 0x002D;
+  ascii_ps = [[0x0028 + 0x005B] + 0x007B];
+  ascii_pe = [[0x0029 + 0x005D] + 0x007D];
+  ascii_po = [[[[0x0021 .. 0x0023] + [0x0025 .. 0x0027]] +
+               [[0x002A + 0x002C] + [0x002E .. 0x002F]]] +
+              [[[0x003A .. 0x003B] + [0x003F .. 0x0040]] + 0x005C]];
+
+  ascii_p = [[[ascii_pc + ascii_pd] + [ascii_ps + ascii_pe]] + ascii_po];
+
+  ascii_sm = [[0x002B + [0x003C .. 0x003E]] + [0x007C + 0x007E]];
+  ascii_sc = 0x0024;
+  ascii_sk = [0x005E + 0x0060];
+
+  ascii_s = [[ascii_sm + ascii_sc] + ascii_sk];
+
+  ascii_zs = 0x0020;
+
+  ascii_z = ascii_zs;
+
+  ascii_cc = [[0x0000 .. 0x001F] + 0x007F];
+
+  ascii_c = ascii_cc;
+
+  ascii = [[[ascii_l + ascii_n] + [ascii_p + ascii_s]] + [ascii_z + ascii_c]];
+
+  ascii_pattern_white_space = [[0x0009 .. 0x000D] + 0x0020];
+  ascii_pattern_syntax = [[[[0x0021 .. 0x002F] + [0x003A .. 0x0040]] +
+                          [[0x005B .. 0x005E] + 0x0060]] + [0x007B .. 0x007E]];
+
+  ascii_id_start = [[0x0041 .. 0x005A] + [0x0061 .. 0x007A]];
+  ascii_id_continue = [[[0x0030 .. 0x0039] + [0x0041 .. 0x005A]] +
+                       [0x005F + [0x0061 .. 0x007A]]];
+
+  ascii_identifier = ascii_id_start ascii_id_continue*;
+
+  ascii_newline = [0x000A .. 0x000D] | 0x000D 0x000A;
+
+  // Other helpers
+
+  white_space_not_newline = [ascii_pattern_white_space - [0x000A .. 0x000D]];
+
+  short_comment_char = [[[ascii - ascii_c] + white_space_not_newline] - '$'];
+  long_comment_char = [[[ascii - ascii_c] + ascii_pattern_white_space] - '$'];
+
+  text_char = [[[ascii - ascii_c] + white_space_not_newline] - ['\' + '$']];
+  text_escape = '\' ['\' + '$'];
+
+  string_char = [[[ascii - ascii_c] + white_space_not_newline] -
+                 [['\' + '$'] + '"']];
+  string_escape = '\' [['\' + '$'] + ['"' + 'n']];
+
+  lowercase = ['a'..'z'];
+  digit = ['0'..'9'];
+
+  normal_part = lowercase (lowercase | digit)*;
+  normal_identifier = normal_part ('_' normal_part)*;
+
+  rich_identifier = '<' [ascii_id_start - '_'] [ascii_id_continue - '_']* '>';
+
+States
+    top_level,
+    macro_body,
+    string,
+    command;
+
+Tokens
+
+    {top_level, string, macro_body}
+    eol = ascii_newline;
+
+    {top_level}
+    macro_kw = 'Macro';
+
+    {top_level}
+    params_kw = 'Params';
+
+    {command}
+    insert_kw = 'Insert';
+
+    {top_level}
+    string_kw = 'String';
+
+    {top_level}
+    context_kw = 'Context';
+
+    {top_level, command}
+    identifier = normal_identifier;
+
+    {top_level->macro_body}
+    begin = '{Begin}';
+
+    {macro_body->top_level}
+    end = '{End}';
+
+    {command, top_level}
+    l_par = '(';
+
+    {command, top_level}
+    r_par = ')';
+
+    {top_level, command}
+    colon = ':';
+
+    {top_level}
+    semi_colon = ';';
+
+    {top_level, command}
+    comma = ',';
+
+    {top_level, command}
+    blank = (' ' | 13 | 10)+;
+
+    {command, macro_body, string}
+    variable = '{' normal_identifier '}';
+
+    {macro_body->command}
+    l_brace = '{';
+
+    {command->macro_body}
+    r_brace = '}';
+
+    {macro_body}
+    text_char = text_char+;
+
+    {macro_body}
+    escape = text_escape;
+
+    {top_level}
+    assign = '=';
+
+    {top_level, string, command}
+    /* custom transition *->previous state */
+    dquote = '"';
+
+    {string}
+    string_text = string_char+;
+
+    {string}
+    string_escape = string_escape;
+
+    {top_level, macro_body, string, command}
+    invalid_identifier = normal_part* '_' digit normal_part+;
+
+Ignored Tokens
+    blank;
+
+Productions
+
+    program =
+        macros;
+
+    macros =
+        {many} macros macro |
+        {one} macro;
+
+    macro =
+        macro_definition eol
+        macro_body;
+
+    macro_body =
+        begin macro_body_parts* eol end;
+
+    macro_body_parts =
+        {insert} l_brace insert_kw colon macro_reference r_brace |
+        {params} l_brace identifier r_brace |
+        {var} variable |
+        {text} text_char |
+        {eol} eol |
+        {escape} escape;
+
+    macro_definition =
+        macro_kw identifier macro_parameters;
+
+    macro_parameters =
+        external_args? internal_args?;
+
+    external_args =
+        params_kw params;
+
+    internal_args =
+        context_kw params?;
+
+    params =
+        {many} params param |
+        {one} param;
+
+    param =
+        identifier colon type option* semi_colon;
+
+    option =
+        comma identifier assign static_value;
+
+    macro_reference =
+        {name} identifier |
+        {param} call;
+
+    static_value =
+        {var} identifier |
+        {string} string;
+
+    type =
+        {string} string_kw |
+        {macros} macro_reference additional_macros;
+
+    additional_macros =
+        {more} additional_macros additional_macro |
+        {zero};
+
+    additional_macro =
+        comma macro_reference;
+
+    call =
+        identifier l_par values r_par;
+
+    values =
+        {many} values comma static_value |
+        {one} static_value;
+
+    string =
+      [l_dquote]:dquote [parts]:string_part* [r_dquote]:dquote;
+
+    string_part =
+        {text} [text]:string_text |
+        {escape} [escape]:string_escape;
+
+
+
+
+
