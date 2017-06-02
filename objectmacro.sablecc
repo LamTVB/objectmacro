@@ -173,7 +173,7 @@ Tokens
     string_escape = string_escape;
 
     {top_level, macro_body, string, command}
-    invalid_identifier = normal_part* '_' digit normal_part+;
+    invalid_identifier = normal_part+ '_' digit normal_part*;
 
 Ignored Tokens
     blank;
