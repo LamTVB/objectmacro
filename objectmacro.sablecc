@@ -72,10 +72,10 @@ Helpers
 
   white_space_not_newline = [ascii_pattern_white_space - [0x000A .. 0x000D]];
 
-  short_comment_char = [[[ascii - ascii_c] + white_space_not_newline] - '$'];
-  long_comment_char = [[[ascii - ascii_c] + ascii_pattern_white_space] - '$'];
+  short_comment_char = [[[ascii - ascii_c] + white_space_not_newline] - [':' + '}']];
+  long_comment_char = [[[ascii - ascii_c] + ascii_pattern_white_space] - ['{' + '}']];
 
-  text_char = [[[ascii - ascii_c] + white_space_not_newline] - ['\' + '$']];
+  text_char = [[[ascii - ascii_c] + white_space_not_newline] - '\'];
   text_escape = '\' ['\' + '$'];
 
   string_char = [[[ascii - ascii_c] + white_space_not_newline] -
@@ -95,6 +95,7 @@ States
     top_level,
     macro_body,
     string,
+    comment,
     command;
 
 Tokens
@@ -117,13 +118,19 @@ Tokens
     {top_level}
     context_kw = 'Context';
 
+    {top_level->comment}
+    short_comment_command = '{Comment:';
+
+    {top_level->comment}
+    long_comment_start = '{Comment}';
+
     {top_level, command}
     identifier = normal_identifier;
 
     {top_level->macro_body}
     begin = '{Begin}';
 
-    {macro_body->top_level}
+    {macro_body->top_level, comment->top_level}
     end = '{End}';
 
     {command, top_level}
@@ -150,7 +157,7 @@ Tokens
     {macro_body->command}
     l_brace = '{';
 
-    {command->macro_body}
+    {command->macro_body, comment->top_level}
     r_brace = '}';
 
     {macro_body}
@@ -172,6 +179,12 @@ Tokens
     {string}
     string_escape = string_escape;
 
+    {comment}
+    short_comment_text = short_comment_char+;
+
+    {comment}
+    long_comment_text = long_comment_char+;
+
     {top_level, macro_body, string, command}
     invalid_identifier = normal_part+ '_' digit normal_part*;
 
@@ -180,12 +193,23 @@ Ignored Tokens
 
 Productions
 
-    program =
-        macros;
+    source_file =
+        source_file_part*;
 
-    macros =
-        {many} macros macro |
-        {one} macro;
+    source_file_part =
+        {short_comment} short_comment |
+        {long_comment} long_comment |
+        {macro} macro;
+
+    short_comment =
+        short_comment_command short_comment_text? r_brace;
+
+    long_comment =
+        long_comment_start long_comment_part* end;
+
+    long_comment_part =
+        {text} long_comment_text |
+        {nested_comment} long_comment;
 
     macro =
         macro_definition eol

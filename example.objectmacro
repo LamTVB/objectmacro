@@ -22,6 +22,14 @@ Macro copyright
      /* This file was written by Lam and Etienne on {year}. */
 {End}
 
+{Comment}
+    Par contre je veux faire un enorme commentaire ici
+    Surtout je veux le faire sur plusieurs lignes
+    Donc j'essaie pour voir
+{End}
+
+{Comment: je veux juste mettre un commentaire la}
+
 Macro class
     Params
         name : String;
@@ -77,13 +85,15 @@ Macro getter_setter
         name : String;
         type : String;
 {Begin}
-    public {type} get{name}(){
-        return this.{name};
-    }
 
-    public void set{name}({type} {name}){
-        this.{name} = {name};
-    }
+public {type} get{name}(){
+    return this.{name};
+}
+
+public void set{name}({type} {name}){
+    this.{name} = {name};
+}
+
 {End}
 
 Macro parameter
