@@ -86,11 +86,11 @@ Macro getter_setter
         type : String;
 {Begin}
 
-public {type} get{name}(){
+public {type} get{name}()\{
     return this.{name};
 }
 
-public void set{name}({type} {name}){
+public void set{name}({type} {name})\{
     this.{name} = {name};
 }
 

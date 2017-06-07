@@ -75,12 +75,12 @@ Helpers
   short_comment_char = [[[ascii - ascii_c] + white_space_not_newline] - [':' + '}']];
   long_comment_char = [[[ascii - ascii_c] + ascii_pattern_white_space] - ['{' + '}']];
 
-  text_char = [[[ascii - ascii_c] + white_space_not_newline] - '\'];
-  text_escape = '\' ['\' + '$'];
+  text_char = [[[ascii - ascii_c] + white_space_not_newline] - ['\' + '{']];
+  text_escape = '\' ['\' + '{'];
 
   string_char = [[[ascii - ascii_c] + white_space_not_newline] -
-                 [['\' + '$'] + '"']];
-  string_escape = '\' [['\' + '$'] + ['"' + 'n']];
+                 [['\' + '{'] + '"']];
+  string_escape = '\' [['\' + '{'] + ['"' + 'n']];
 
   lowercase = ['a'..'z'];
   uppercase = ['A' .. 'Z'];
@@ -151,9 +151,6 @@ Tokens
     {top_level, command}
     blank = (' ' | 13 | 10)+;
 
-    {command, macro_body, string}
-    variable = '{' normal_identifier '}';
-
     {macro_body->command}
     l_brace = '{';
 
@@ -220,7 +217,7 @@ Productions
 
     macro_body_parts =
         {insert} l_brace insert_kw colon macro_reference r_brace |
-        {var} variable |
+        {var} l_brace identifier r_brace |
         {text} text_char |
         {eol} eol |
         {escape} escape;
@@ -232,17 +229,13 @@ Productions
         external_args? internal_args?;
 
     external_args =
-        params_kw params;
+        params_kw [params]:param*;
 
     internal_args =
-        context_kw params?;
-
-    params =
-        {many} params param |
-        {one} param;
+        context_kw [params]:param*;
 
     param =
-        identifier colon type option* semi_colon;
+        identifier colon type [options]:option* semi_colon;
 
     option =
         comma identifier assign static_value;
@@ -278,7 +271,8 @@ Productions
 
     string_part =
         {text} [text]:string_text |
-        {escape} [escape]:string_escape;
+        {escape} [escape]:string_escape |
+        {var} l_brace identifier r_brace;
 
 
 
