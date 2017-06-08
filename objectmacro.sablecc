@@ -75,8 +75,8 @@ Helpers
   short_comment_char = [[[ascii - ascii_c] + white_space_not_newline] - [':' + '}']];
   long_comment_char = [[[ascii - ascii_c] + ascii_pattern_white_space] - ['{' + '}']];
 
-  text_char = [[[ascii - ascii_c] + white_space_not_newline] - ['\' + '{']];
-  text_escape = '\' ['\' + '{'];
+  text_char = [[[ascii - ascii_c] + white_space_not_newline] - '{'];
+  text_escape = '{' '{';
 
   string_char = [[[ascii - ascii_c] + white_space_not_newline] -
                  [['\' + '{'] + '"']];
@@ -94,28 +94,29 @@ Helpers
 States
     top_level,
     macro_body,
+    macro_definition,
     string,
     comment,
     command;
 
 Tokens
 
-    {top_level, string, macro_body}
+    {top_level, string, macro_body, macro_definition}
     eol = ascii_newline;
 
-    {top_level}
+    {top_level->macro_definition}
     macro_kw = 'Macro';
 
-    {top_level}
+    {macro_definition}
     params_kw = 'Params';
 
     {command}
     insert_kw = 'Insert';
 
-    {top_level}
+    {macro_definition}
     string_kw = 'String';
 
-    {top_level}
+    {macro_definition}
     context_kw = 'Context';
 
     {top_level->comment}
@@ -163,10 +164,10 @@ Tokens
     {macro_body}
     escape = text_escape;
 
-    {top_level}
+    {macro_definition}
     assign = '=';
 
-    {top_level, string, command}
+    {macro_definition, string, command}
     /* custom transition *->previous state */
     dquote = '"';
 
