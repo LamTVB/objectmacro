@@ -110,9 +110,6 @@ Tokens
     {macro_definition}
     params_kw = 'Params';
 
-    {command}
-    insert_kw = 'Insert';
-
     {macro_definition}
     string_kw = 'String';
 
@@ -167,6 +164,18 @@ Tokens
     {macro_definition}
     assign = '=';
 
+    {macro_body}
+    l_brace = '{';
+
+    {command->macro_body}
+    r_brace = '}';
+
+    {macro_body}
+    variable = '{' normal_identifier '}';
+
+    {macro_body->command}
+    insert_command = '{Insert:';
+
     {macro_definition, string, command}
     /* custom transition *->previous state */
     dquote = '"';
@@ -185,6 +194,9 @@ Tokens
 
     {top_level, macro_body, string, command}
     invalid_identifier = normal_part+ '_' digit normal_part*;
+
+    {macro_body}
+    unknown_command = '{' uppercase normal_part* ':';
 
 Ignored Tokens
     blank;
@@ -217,10 +229,11 @@ Productions
         begin macro_body_parts* eol end;
 
     macro_body_parts =
-        {insert} l_brace insert_kw colon macro_reference r_brace |
-        {var} l_brace identifier r_brace |
+        {insert} insert_command macro_reference r_brace |
+        {var} variable |
         {text} text_char |
         {eol} eol |
+        {l_brace} l_brace |
         {escape} escape;
 
     macro_definition =
@@ -273,7 +286,7 @@ Productions
     string_part =
         {text} [text]:string_text |
         {escape} [escape]:string_escape |
-        {var} l_brace identifier r_brace;
+        {var} variable;
 
 
 
