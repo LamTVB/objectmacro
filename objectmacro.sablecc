@@ -73,7 +73,7 @@ Helpers
   white_space_not_newline = [ascii_pattern_white_space - [0x000A .. 0x000D]];
 
   short_comment_char = [[ascii - ascii_c] + white_space_not_newline];
-  long_comment_char = [[[[ascii - ascii_c] + ascii_pattern_white_space] - ['*' + '/']];
+  long_comment_char = [[[ascii - ascii_c] + ascii_pattern_white_space] - ['*' + '/']];
 
   text_char = [[[ascii - ascii_c] + white_space_not_newline] - '{'];
   text_escape = '{' '{';
