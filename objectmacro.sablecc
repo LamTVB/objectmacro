@@ -100,7 +100,7 @@ States
 
 Tokens
 
-    {top_level, string, macro_body, macro_definition}
+    {string, macro_body, macro_definition}
     eol = ascii_newline;
 
     {top_level->macro_definition}
@@ -119,7 +119,7 @@ Tokens
     identifier = normal_identifier;
 
     {macro_definition}
-    short_macro_comment = '//' short_comment_char*;
+    short_macro_comment = '//' short_comment_char* ascii_newline?;
 
     {macro_definition}
     long_macro_comment = '/*' [long_comment_char + '/']*
@@ -193,7 +193,7 @@ Tokens
     unknown_command = '{' uppercase normal_part* ':';
 
 Ignored Tokens
-    blank, short_macro_comment;
+    blank, short_macro_comment, long_macro_comment;
 
 Productions
 
@@ -229,10 +229,10 @@ Productions
         external_args? internal_args?;
 
     external_args =
-        params_kw [params]:param*;
+        params_kw [params]:param+;
 
     internal_args =
-        context_kw [params]:param*;
+        context_kw [params]:param+;
 
     param =
         identifier colon type [options]:option* semi_colon;
