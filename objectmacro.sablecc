@@ -72,8 +72,8 @@ Helpers
 
   white_space_not_newline = [ascii_pattern_white_space - [0x000A .. 0x000D]];
 
-  short_comment_char = [[[ascii - ascii_c] + white_space_not_newline] - [':' + '}']];
-  long_comment_char = [[[ascii - ascii_c] + ascii_pattern_white_space] - ['{' + '}']];
+  short_comment_char = [[ascii - ascii_c] + white_space_not_newline];
+  long_comment_char = [[ascii - ascii_c] + ascii_pattern_white_space];
 
   text_char = [[[ascii - ascii_c] + white_space_not_newline] - '{'];
   text_escape = '{' '{';
@@ -96,7 +96,6 @@ States
     macro_body,
     macro_definition,
     string,
-    comment,
     command;
 
 Tokens
@@ -116,44 +115,35 @@ Tokens
     {macro_definition}
     context_kw = 'Context';
 
-    {top_level->comment}
-    short_comment_command = '{Comment:';
-
-    {top_level->comment}
-    long_comment_start = '{Comment}';
-
-    {top_level, command}
+    {macro_definition, command}
     identifier = normal_identifier;
 
-    {top_level->macro_body}
+    {macro_definition}
+    short_macro_comment = '//' short_comment_char*;
+
+    {macro_definition->macro_body}
     begin = '{Begin}';
 
-    {macro_body->top_level, comment->top_level}
+    {macro_body->top_level}
     end = '{End}';
 
-    {command, top_level}
+    {command, macro_definition}
     l_par = '(';
 
-    {command, top_level}
+    {command, macro_definition}
     r_par = ')';
 
-    {top_level, command}
+    {macro_definition, command}
     colon = ':';
 
-    {top_level}
+    {macro_definition}
     semi_colon = ';';
 
-    {top_level, command}
+    {macro_definition, command}
     comma = ',';
 
-    {top_level, command}
+    {top_level, command, macro_definition}
     blank = (' ' | 13 | 10)+;
-
-    {macro_body->command}
-    l_brace = '{';
-
-    {command->macro_body, comment->top_level}
-    r_brace = '}';
 
     {macro_body}
     text_char = text_char+;
@@ -199,7 +189,7 @@ Tokens
     unknown_command = '{' uppercase normal_part* ':';
 
 Ignored Tokens
-    blank;
+    blank, short_macro_comment;
 
 Productions
 
