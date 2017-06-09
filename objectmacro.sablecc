@@ -176,11 +176,11 @@ Tokens
     {string}
     string_escape = string_escape;
 
-    {comment}
-    short_comment_text = short_comment_char+;
+    {top_level}
+    ignore_macro_start = '{StartIgnoring}';
 
-    {comment}
-    long_comment_text = long_comment_char+;
+    {top_level}
+    ignore_macro_end = '{StopIgnoring}';
 
     {top_level, macro_body, string, command}
     invalid_identifier = normal_part+ '_' digit normal_part*;
@@ -197,19 +197,11 @@ Productions
         source_file_part*;
 
     source_file_part =
-        {short_comment} short_comment |
-        {long_comment} long_comment |
+        {ignore_macro} ignore_macro |
         {macro} macro;
 
-    short_comment =
-        short_comment_command short_comment_text? r_brace;
-
-    long_comment =
-        long_comment_start long_comment_part* end;
-
-    long_comment_part =
-        {text} long_comment_text |
-        {nested_comment} long_comment;
+    ignore_macro =
+        ignore_macro_start source_file ignore_macro_end;
 
     macro =
         macro_definition eol
