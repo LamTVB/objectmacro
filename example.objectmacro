@@ -1,3 +1,20 @@
+{StartIgnoring}
+Macro attribute
+    /*Params
+        name : String;
+        type : String;*/
+    Context
+        indent : String;
+{Begin}
+    class toto{
+        int i = 1;
+    }
+    private {type} {name};
+    {Insert: getter_setter(name, type)}
+    {Insert : lala}
+{End}
+{StopIgnoring}
+
 Macro copyright
     Context
         year : String;
@@ -22,17 +39,9 @@ Macro copyright
      /* This file was written by Lam and Etienne on {year}. */
 {End}
 
-{Comment}
-    Par contre je veux faire un enorme commentaire ici
-    Surtout je veux le faire sur plusieurs lignes
-    Donc j'essaie pour voir
-{End}
-
-{Comment: je veux juste mettre un commentaire la}
-
 Macro class
     Params
-        name : String;
+        name : String; //Si je test un token
         indent : String;
         attributes : attribute(indent), separator="\n";
         methods : public_method(indent), private_method(indent), separator="\n";
@@ -41,18 +50,6 @@ Macro class
     {attributes}
     {methods}
     {getters_setters}
-{End}
-
-Macro attribute
-    Params
-        name : String;
-        type : String;
-    Context
-        indent : String;
-{Begin}
-    private {type} {name};
-
-    {Insert: getter_setter(name, type)}
 {End}
 
 Macro public_method
@@ -86,20 +83,12 @@ Macro getter_setter
         type : String;
 {Begin}
 
-public {type} get{name}()\{
+public {type} get{name}(){{
     return this.{name};
 }
 
-public void set{name}({type} {name})\{
+public void set{name}({type} {name}){{
     this.{name} = {name};
 }
 
-{End}
-
-Macro parameter
-    Params
-        name : String;
-        type : String;
-{Begin}
-    {type} {name}
 {End}
