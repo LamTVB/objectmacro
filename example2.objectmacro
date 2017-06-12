@@ -1,0 +1,16 @@
+{StartIgnoring}
+Macro attribute
+    /*Params
+        name : String;
+        type : String;*/
+    Context
+        indent : String;
+{Begin}
+    class toto{
+        int i = 1;
+    }
+    private {type} {name};
+    {Insert: getter_setter(name, type)}
+    {Insert : lala}
+{End}
+{StopIgnoring}
