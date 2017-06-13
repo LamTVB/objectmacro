@@ -121,9 +121,9 @@ Tokens
     {macro_definition}
     short_macro_comment = '//' short_comment_char* ascii_newline?;
 
-    {macro_definition}
+    {top_level, macro_definition}
     long_macro_comment = '/*' [long_comment_char + '/']*
-                 ('*' (long_comment_char [long_comment_char + '/']*)?)* '*/';
+            ('*' (long_comment_char [long_comment_char + '/']*)?)* '*/';
 
     {macro_definition->macro_body}
     begin = '{Begin}';
@@ -150,21 +150,18 @@ Tokens
     blank = (' ' | 13 | 10)+;
 
     {macro_body}
-    text_char = text_char+;
+    macro_body_text = text_char+ | '{';
 
     {macro_body}
-    escape = text_escape;
+    text_escape = text_escape;
 
     {macro_definition}
     assign = '=';
 
-    {macro_body}
-    l_brace = '{';
-
     {command->macro_body}
     r_brace = '}';
 
-    {macro_body}
+    {macro_body, string}
     variable = '{' normal_identifier '}';
 
     {macro_body->command}
@@ -208,19 +205,17 @@ Productions
         ignore_macro_start source_file ignore_macro_end;
 
     macro =
-        macro_definition eol
-        macro_body;
+        macro_definition eol macro_body;
 
     macro_body =
-        begin macro_body_parts* eol end;
+        begin [begin_eol]:eol macro_body_parts* [end_eol]:eol end;
 
     macro_body_parts =
         {insert} insert_command macro_reference r_brace |
         {var} variable |
-        {text} text_char |
+        {text} macro_body_text |
         {eol} eol |
-        {l_brace} l_brace |
-        {escape} escape;
+        {escape} text_escape;
 
     macro_definition =
         macro_kw identifier macro_parameters;
@@ -271,10 +266,5 @@ Productions
 
     string_part =
         {text} [text]:string_text |
-        {escape} [escape]:string_escape |
+        {escape} string_escape |
         {var} variable;
-
-
-
-
-
