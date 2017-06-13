@@ -1,16 +1,88 @@
+/*
+This file is part of SableCC ( http://sablecc.org ).
+
+See the NOTICE file distributed with this work for copyright information.
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
+/* ========= macro normal identifier ========== */
+Macro macro_normal_id
+{Begin}
+    Hello c'est une macro
+{End}
+
+/* ========== test macro params ========== */
+Macro macro_params
+    Params
+        name : String;
+        firstname : String;
+{Begin}
+My name is {firstname} {name}.
+{End}
+
+/* ========== test macro Insert ========== */
+Macro insert_macro
+{Begin}
+    {Insert: macro_normal_id}
+{End}
+
+
+/* ========== test Macro params with directives ========== */
+Macro macro_params_directives
+    Params
+        year : String;
+        presentations : macro_params,
+                       before_first="Persons list",
+                       none="Nobody is here ! \n",
+                       after_last="This list was generated in {year}.";
+{Begin}
+    {presentations}
+{End}
+
+/* ========== Ignore macro into ignore macro========== */
+
 {StartIgnoring}
 Macro attribute
-    /*Params
-        name : String;
-        type : String;*/
-    Context
-        indent : String;
 {Begin}
     class toto{
         int i = 1;
     }
     private {type} {name};
     {Insert: getter_setter(name, type)}
-    {Insert : lala}
+    {Insert : macro_params}
+    {type }
+{End}
+{StartIgnoring}
+Macro getter_setter
+    //Petit commentaire par ici
+     Context
+        name : String;
+        type : String;
+{Begin}
+    public {type} {name}();
+{End}
+{StopIgnoring}
+{StopIgnoring}
+
+/* ========== Ignore macro with comments in macro definition ========== */
+
+{StartIgnoring}
+Macro getter_setter
+     /* Context
+        name : String;
+        type : String; */
+{Begin}
+    public {type} {name}();
 {End}
 {StopIgnoring}

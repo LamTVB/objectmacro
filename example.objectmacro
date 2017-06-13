@@ -15,6 +15,12 @@ Macro attribute
 {End}
 {StopIgnoring}
 
+/*
+Je test un nouveau commentaire ici
+Mais sur plusieurs lignes seulement
+je pense que ceux a une seule ligne ne devrait pas etre utilise
+*/
+
 Macro copyright
     Context
         year : String;
