@@ -100,7 +100,7 @@ States
 
 Tokens
 
-    {string, macro_body, macro_definition}
+    {macro_body}
     eol = ascii_newline;
 
     {top_level->macro_definition}
@@ -147,10 +147,10 @@ Tokens
     comma = ',';
 
     {top_level, command, macro_definition}
-    blank = (' ' | 13 | 10)+;
+    blank = ascii_pattern_white_space+;
 
     {macro_body}
-    macro_body_text = text_char+ | '{';
+    text_part = text_char+ | '{';
 
     {macro_body}
     text_escape = text_escape;
@@ -205,7 +205,7 @@ Productions
         ignore_macro_start source_file ignore_macro_end;
 
     macro =
-        macro_definition eol macro_body;
+        macro_definition macro_body;
 
     macro_body =
         begin [begin_eol]:eol macro_body_parts* [end_eol]:eol end;
@@ -213,7 +213,7 @@ Productions
     macro_body_parts =
         {insert} insert_command macro_reference r_brace |
         {var} variable |
-        {text} macro_body_text |
+        {text} text_part |
         {eol} eol |
         {escape} text_escape;
 
