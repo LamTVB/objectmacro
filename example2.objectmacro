@@ -78,7 +78,7 @@ Macro getter_setter
 /* ========== Ignore macro with comments in macro definition ========== */
 
 {StartIgnoring}
-Macro getter_setter
+Macro getter_123setter_lala
      /* Context
         name : String;
         type : String; */

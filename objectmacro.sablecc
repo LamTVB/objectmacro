@@ -183,8 +183,8 @@ Tokens
     {top_level}
     ignore_macro_end = '{StopIgnoring}';
 
-    {top_level, macro_body, string, command}
-    invalid_identifier = normal_part+ '_' digit normal_part*;
+    {top_level, macro_body, string, command, macro_definition}
+    invalid_identifier = ascii_id_start* ('_' digit+ ascii_id_continue*)*;
 
     {macro_body}
     unknown_command = '{' uppercase normal_part* ':';
