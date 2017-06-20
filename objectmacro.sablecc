@@ -118,12 +118,8 @@ Tokens
     {macro_definition, command}
     identifier = normal_identifier;
 
-    {macro_definition}
-    short_macro_comment = '//' short_comment_char* ascii_newline?;
-
     {top_level, macro_definition}
-    long_macro_comment = '/*' [long_comment_char + '/']*
-            ('*' (long_comment_char [long_comment_char + '/']*)?)* '*/';
+    comment = '#' short_comment_char* ascii_newline?;
 
     {macro_definition->macro_body}
     begin = '{Begin}';
@@ -178,10 +174,10 @@ Tokens
     string_escape = string_escape;
 
     {top_level}
-    ignore_macro_start = '{StartIgnoring}';
+    ignore_macro_start = 'Start Ignoring';
 
     {top_level}
-    ignore_macro_end = '{StopIgnoring}';
+    ignore_macro_end = 'Stop Ignoring';
 
     {top_level, macro_body, string, command, macro_definition}
     invalid_identifier = ascii_id_start* ('_' digit+ ascii_id_continue*)*;
@@ -189,8 +185,11 @@ Tokens
     {macro_body}
     unknown_command = '{' uppercase normal_part* ':';
 
+    {macro_body}
+    invalid_var = '{' ascii_id_start* ('_' digit+ ascii_id_continue*)* '}';
+
 Ignored Tokens
-    blank, short_macro_comment, long_macro_comment;
+    blank, comment;
 
 Productions
 
