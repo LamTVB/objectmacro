@@ -194,74 +194,126 @@ Ignored Tokens
 Productions
 
     source_file =
-        source_file_part*;
+        [source_file_parts]:source_file_part* {-> New source_file([source_file_parts.source_file_part])};
 
-    source_file_part =
-        {ignore_macro} ignore_macro |
+    source_file_part {->source_file_part?} =
+        {ignore_macro} ignore_macro {-> Null}|
         {macro} macro;
 
-    ignore_macro =
-        ignore_macro_start source_file ignore_macro_end;
+    ignore_macro
+        {-> } =
+        ignore_macro_start source_file ignore_macro_end {-> };
 
-    macro =
-        macro_definition macro_body;
+    macro {-> macro} =
+        macro_definition macro_body
+        {-> New macro(macro_definition.macro_kw, macro_definition.identifier, [macro_definition.params], [macro_definition.contexts],
+                      macro_body.begin, [macro_body.macro_body_parts])};
 
-    macro_body =
-        begin [begin_eol]:eol macro_body_parts* [end_eol]:eol end;
+    macro_body {-> begin [macro_body_parts]:macro_body_part* } =
+        begin [begin_eol]:eol [macro_body_parts]:macro_body_part* [end_eol]:eol end
+            {-> begin [macro_body_parts.macro_body_part]};
 
-    macro_body_parts =
+    macro_body_part {-> macro_body_part?} =
         {insert} insert_command macro_reference r_brace |
         {var} variable |
         {text} text_part |
         {eol} eol |
         {escape} text_escape;
 
-    macro_definition =
-        macro_kw identifier macro_parameters;
+    macro_definition {-> macro_kw identifier [params]:param* [contexts]:param* } =
+        macro_kw identifier macro_parameters {-> macro_kw identifier [macro_parameters.params] [macro_parameters.contexts] };
 
-    macro_parameters =
-        external_args? internal_args?;
+    macro_parameters {-> [params]:param* [contexts]:param*} =
+        [params]:external_args? [contexts]:internal_args? {-> [params.params] [contexts.params] };
 
-    external_args =
-        params_kw [params]:param+;
+    external_args {-> [params]:param*} =
+        params_kw [params]:param+ {-> [params.param]};
 
-    internal_args =
-        context_kw [params]:param+;
+    internal_args {-> [params]:param*} =
+        context_kw [params]:param+ {-> [params.param]};
 
     param =
-        identifier colon type [options]:option* semi_colon;
+        identifier colon type [options]:option* semi_colon {-> New param(identifier,type,[options])};
 
     option =
-        comma identifier assign static_value;
+        comma identifier assign static_value {-> New option(identifier, static_value)};
 
-    macro_reference =
-        {name} identifier |
-        {param} call;
+    macro_reference {-> macro_reference}=
+        {name} identifier {-> New macro_reference.name(identifier)}|
+        {macro_call} call {-> New macro_reference.macro_call(call.identifier, [call.static_values])};
 
     static_value =
         {var} identifier |
-        {string} string;
+        {string} string {-> New static_value.string([string.string])};
+
+    type =
+        {string} string_kw {-> New type.string(string_kw)}|
+        {macros} macro_reference [additional_macros_reference]:additional_macro_reference* {-> New type.macros([macro_reference, additional_macros_reference.macro_reference])};
+
+    additional_macro_reference {-> macro_reference} =
+        comma macro_reference {-> macro_reference};
+
+    call {-> identifier [static_values]:static_value*} =
+        identifier l_par values r_par {-> identifier [values.static_values]};
+
+    values {-> [static_values]:static_value*} =
+        static_value [additional_static_values]:additional_static_value* {-> [static_value, additional_static_values.static_value]};
+
+    additional_static_value {-> static_value}=
+        comma static_value {-> static_value};
+
+    string {-> [string]:string_part*} =
+      [l_dquote]:dquote [parts]:string_part* [r_dquote]:dquote {-> [parts.string_part]};
+
+    string_part {-> string_part} =
+        {text} [text]:string_text |
+        {escape} string_escape |
+        {var} variable;
+
+Abstract Syntax Tree
+
+    source_file =
+        [source_file_parts]:source_file_part*;
+
+    source_file_part =
+        {ignore_macro} ignore_macro |
+        {macro} macro;
+
+    ignore_macro = ;
+
+    macro =
+        macro_kw identifier [params]:param* [contexts]:param* begin [macro_body_parts]:macro_body_part*;
+
+    macro_body_part =
+        {insert} insert_command macro_reference r_brace |
+        {var} variable |
+        {text} text_part |
+        {eol} eol |
+        {escape} text_escape;
+
+    param =
+        identifier type [options]:option*;
+
+    option =
+        identifier static_value;
+
+    macro_reference =
+        {name} identifier |
+        {macro_call} identifier [values]:static_value*;
+
+    static_value =
+        {var} identifier |
+        {string} [parts]:string_part*;
 
     type =
         {string} string_kw |
-        {macros} macro_reference additional_macros;
-
-    additional_macros =
-        {more} additional_macros additional_macro |
-        {zero};
-
-    additional_macro =
-        comma macro_reference;
+        {macros} macro_reference+;
 
     call =
-        identifier l_par values r_par;
-
-    values =
-        {many} values comma static_value |
-        {one} static_value;
+        identifier [static_values]:static_value+;
 
     string =
-      [l_dquote]:dquote [parts]:string_part* [r_dquote]:dquote;
+      [parts]:string_part*;
 
     string_part =
         {text} [text]:string_text |
