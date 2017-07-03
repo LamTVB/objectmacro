@@ -84,3 +84,10 @@ Macro getter_setter
     public {type} {name}();
 {End}
 Stop Ignoring
+
+# ========== Test comment in macro ==========
+
+Macro comment
+{Begin}
+    # Si je commente ici ?
+{End}

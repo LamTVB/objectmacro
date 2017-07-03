@@ -119,7 +119,7 @@ Tokens
     identifier = normal_identifier;
 
     {top_level, macro_definition}
-    comment = '#' short_comment_char* ascii_newline?;
+    comment = '#' short_comment_char*;
 
     {macro_definition->macro_body}
     begin = '{Begin}';
@@ -204,7 +204,7 @@ Productions
         {-> } =
         ignore_macro_start source_file ignore_macro_end {-> };
 
-    macro {-> macro} =
+    macro =
         macro_definition macro_body
         {-> New macro(macro_definition.macro_kw, macro_definition.identifier, [macro_definition.params], [macro_definition.contexts],
                       macro_body.begin, [macro_body.macro_body_parts])};
