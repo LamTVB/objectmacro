@@ -1,4 +1,4 @@
 test3.7:
   image : lamtvb/sablecc3.7
   script:
-  - java -jar sablecc.jar objectmacro.sablecc
+  - find sablecc.jar
