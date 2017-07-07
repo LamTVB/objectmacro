@@ -1,5 +1,5 @@
 before_script :
-- sudo apt-get update
+- apt-get update
 
 test3.7:
   script:
