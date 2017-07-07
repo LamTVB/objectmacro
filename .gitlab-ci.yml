@@ -2,7 +2,7 @@ before_script :
 - apt-get update
 
 test3.7:
-  image : lamtvb/sablecc3.7
+  image : openjdk
   script:
   - wget https://downloads.sourceforge.net/project/sablecc/SableCC/3.7/sablecc-3.7.zip
   - unzip sablecc-3.7.zip
