@@ -45,6 +45,13 @@ Macro copyright
      /* This file was written by Lam and Etienne on {year}. */
 {End}
 
+Macro copyright
+    Context
+        year : String;
+{Begin}
+    lala
+{End}
+
 Macro class
     Params
         name : String; //Si je test un token

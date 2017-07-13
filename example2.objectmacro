@@ -42,10 +42,11 @@ Macro macro_params_directives
         year : String;
         presentations : macro_params,
                        before_first="Persons list",
-                       none="Nobody is here ! \n",
-                       after_last="This list was generated in {year}.";
+                       after_last="This list was generated in {year}.",
+                       none="Nobody is here ! \n";
 {Begin}
     {presentations}
+    {year}
 {End}
 
 # ========== Ignore macro into ignore macro==========

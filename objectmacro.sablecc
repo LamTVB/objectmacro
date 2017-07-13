@@ -194,20 +194,22 @@ Ignored Tokens
 Productions
 
     source_file =
-        [source_file_parts]:source_file_part* {-> New source_file([source_file_parts.source_file_part])};
+        [source_file_parts]:source_file_part*
+            {-> New source_file([source_file_parts.source_file_part])};
 
     source_file_part {->source_file_part?} =
-        {ignore_macro} ignore_macro {-> Null}|
+        {ignore_macro} ignore_macro|
         {macro} macro;
 
     ignore_macro
-        {-> } =
-        ignore_macro_start source_file ignore_macro_end {-> };
+        {-> ignore_macro} =
+        ignore_macro_start source_file ignore_macro_end {-> New ignore_macro(ignore_macro_start, ignore_macro_end)};
 
     macro =
         macro_definition macro_body
-        {-> New macro(macro_definition.macro_kw, macro_definition.identifier, [macro_definition.params], [macro_definition.contexts],
-                      macro_body.begin, [macro_body.macro_body_parts])};
+        {-> New macro(macro_definition.macro_kw, macro_definition.identifier,
+        [macro_definition.params], [macro_definition.contexts],
+                  macro_body.begin, [macro_body.macro_body_parts])};
 
     macro_body {-> begin [macro_body_parts]:macro_body_part* } =
         begin [begin_eol]:eol [macro_body_parts]:macro_body_part* [end_eol]:eol end
@@ -279,10 +281,11 @@ Abstract Syntax Tree
         {ignore_macro} ignore_macro |
         {macro} macro;
 
-    ignore_macro = ;
+    ignore_macro =
+        ignore_macro_start ignore_macro_end;
 
     macro =
-        macro_kw identifier [params]:param* [contexts]:param* begin [macro_body_parts]:macro_body_part*;
+        macro_kw [name]:identifier [params]:param* [contexts]:param* begin [macro_body_parts]:macro_body_part*;
 
     macro_body_part =
         {insert} insert_command macro_reference r_brace |
