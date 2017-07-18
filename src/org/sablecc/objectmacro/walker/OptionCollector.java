@@ -43,7 +43,7 @@ public class OptionCollector
     public void inAParam(
             AParam node) {
 
-        this.currentParam = this.currentMacro.getParam(node.getIdentifier().getText());
+        this.currentParam = this.currentMacro.getParam(node.getName().getText());
     }
 
     @Override

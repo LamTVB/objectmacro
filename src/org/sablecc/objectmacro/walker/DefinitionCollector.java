@@ -44,7 +44,7 @@ public class DefinitionCollector
             AParam node) {
 
         this.currentParam = this.currentMacro
-                .getParam(node.getIdentifier().getText());
+                .getParam(node.getName().getText());
     }
 
     @Override

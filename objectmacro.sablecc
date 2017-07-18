@@ -295,7 +295,7 @@ Abstract Syntax Tree
         {escape} text_escape;
 
     param =
-        identifier type [options]:option*;
+        [name]:identifier type [options]:option*;
 
     option =
         identifier static_value;

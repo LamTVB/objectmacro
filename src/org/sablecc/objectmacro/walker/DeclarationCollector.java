@@ -47,13 +47,13 @@ public class DeclarationCollector
 
         for (PParam param_production : params) {
             AParam param_node = (AParam) param_production;
-            newMacro.newParam(param_node.getIdentifier());
+            newMacro.newParam(param_node.getName());
         }
 
         for (PParam param_production : contexts) {
 
             AParam param_node = (AParam) param_production;
-            newMacro.newContext(param_node.getIdentifier());
+            newMacro.newContext(param_node.getName());
         }
     }
 
