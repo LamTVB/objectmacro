@@ -81,7 +81,22 @@ public class Macro {
             throw new InternalException("Param of name " + name + " is undefined");
         }
 
-        Param param = this.namedParams.get(name);
-        param.setUsed(true);
+        this.namedParams.get(name).setUsed();
+    }
+
+    public List<Param> getAllParams(){
+        return this.allParams;
+    }
+
+    public boolean isUsing(
+            Macro macro){
+
+        for(Param parameter : macro.getAllParams()){
+            if(parameter.getMacroReference(this.getName().getText()) != null){
+                return true;
+            }
+        }
+
+        return false;
     }
 }

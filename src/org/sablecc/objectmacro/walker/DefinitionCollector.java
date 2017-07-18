@@ -65,4 +65,16 @@ public class DefinitionCollector
 
         this.currentParam.addMacroReference(node.getIdentifier());
     }
+
+    @Override
+    public void caseANameMacroReference(
+            ANameMacroReference node) {
+
+        //To avoid verifying anything else than a parameter definition
+        if (this.currentParam == null) {
+            return;
+        }
+
+        this.currentParam.addMacroReference(node.getIdentifier());
+    }
 }

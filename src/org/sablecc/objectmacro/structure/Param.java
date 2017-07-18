@@ -4,10 +4,7 @@ import org.sablecc.objectmacro.exception.InternalException;
 import org.sablecc.objectmacro.syntax3.node.AOption;
 import org.sablecc.objectmacro.syntax3.node.TIdentifier;
 
-import java.util.LinkedHashMap;
-import java.util.LinkedList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by lam on 06/06/17.
@@ -19,6 +16,8 @@ public class Param {
     private TIdentifier name;
 
     private List<Macro> macroReferences = new LinkedList<>();
+
+    private Map<String, Macro> macroReferencesName = new HashMap<>();
 
     private Map<TIdentifier, StaticValue> options;
 
@@ -65,8 +64,8 @@ public class Param {
         return isUsed;
     }
 
-    public void setUsed(boolean used) {
-        isUsed = used;
+    public void setUsed() {
+        isUsed = true;
     }
 
     public TIdentifier getName(){
@@ -81,5 +80,12 @@ public class Param {
         Macro macro = this.globalIndex.getMacro(name);
 
         this.macroReferences.add(macro);
+        this.macroReferencesName.put(name, macro);
+    }
+
+    public Macro getMacroReference(
+            String macroName){
+
+        return this.macroReferencesName.get(macroName);
     }
 }
