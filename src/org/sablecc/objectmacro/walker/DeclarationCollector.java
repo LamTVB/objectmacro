@@ -1,13 +1,11 @@
 package org.sablecc.objectmacro.walker;
 
-import org.sablecc.objectmacro.exception.InternalException;
+import org.sablecc.objectmacro.exception.CompilerException;
 import org.sablecc.objectmacro.structure.GlobalIndex;
 import org.sablecc.objectmacro.structure.Macro;
-import org.sablecc.objectmacro.structure.Param;
 import org.sablecc.objectmacro.syntax3.analysis.DepthFirstAdapter;
 import org.sablecc.objectmacro.syntax3.node.*;
 
-import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -36,8 +34,8 @@ public class DeclarationCollector
             AMacro node) {
 
         if (node.getBegin().getPos() != 1) {
-            throw new InternalException(
-                    "Token {Begin} must be at the beginning of the line");
+            throw new CompilerException(
+                    "Token {Begin} must be at the beginning of the line", node.getBegin());
         }
 
         Macro newMacro = this.globalIndex.newMacro(node);
@@ -46,6 +44,7 @@ public class DeclarationCollector
         List<PParam> contexts = node.getContexts();
 
         for (PParam param_production : params) {
+
             AParam param_node = (AParam) param_production;
             newMacro.newParam(param_node.getName());
         }
@@ -62,7 +61,7 @@ public class DeclarationCollector
             AIgnoreMacro node) {
 
         if (node.getIgnoreMacroStart().getPos() > 1) {
-            throw new InternalException("'Start Ignoring' must start at the beginning of the line");
+            throw new CompilerException("'Start Ignoring' must start at the beginning of the line", node.getIgnoreMacroStart());
         }
         //TODO get macros ignored
     }

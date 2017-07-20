@@ -1,5 +1,6 @@
 package org.sablecc.objectmacro.structure;
 
+import org.sablecc.objectmacro.exception.CompilerException;
 import org.sablecc.objectmacro.exception.InternalException;
 import org.sablecc.objectmacro.syntax3.node.AOption;
 import org.sablecc.objectmacro.syntax3.node.TIdentifier;
@@ -19,7 +20,7 @@ public class Param {
 
     private Map<String, Macro> macroReferencesName = new HashMap<>();
 
-    private Map<TIdentifier, StaticValue> options;
+    private Map<String, StaticValue> options = new HashMap<>();
 
     private boolean isUsed;
 
@@ -29,21 +30,20 @@ public class Param {
 
         this.globalIndex = globalIndex;
         this.name = name;
-        this.options = new LinkedHashMap<>();
     }
 
     public StaticValue newOption(
             AOption option) {
 
         String optionName = option.getIdentifier().getText();
-        if (this.options.containsKey(option.getIdentifier())) {
-            throw new InternalException(
-                    "Directive '" + optionName + "' is already defined for this parameter");
+        if (this.options.containsKey(optionName)) {
+            throw new CompilerException(
+                    "Directive '" + optionName + "' is already defined for this parameter", option.getIdentifier());
         }
 
         StaticValue newValue = new StaticValue();
         this.options.put(
-                option.getIdentifier(), newValue);
+                optionName, newValue);
 
         return newValue;
     }
@@ -77,7 +77,12 @@ public class Param {
             TIdentifier macroName){
 
         String name = macroName.getText();
-        Macro macro = this.globalIndex.getMacro(name);
+        if(this.macroReferencesName.containsKey(name)){
+            throw new CompilerException(
+                    "This parameter already references macro of name '" + macroName + "'", macroName);
+        }
+
+        Macro macro = this.globalIndex.getMacro(macroName);
 
         this.macroReferences.add(macro);
         this.macroReferencesName.put(name, macro);

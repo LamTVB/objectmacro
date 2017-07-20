@@ -43,7 +43,7 @@ public class OptionCollector
     public void inAParam(
             AParam node) {
 
-        this.currentParam = this.currentMacro.getParam(node.getName().getText());
+        this.currentParam = this.currentMacro.getParam(node.getName());
     }
 
     @Override
@@ -75,7 +75,7 @@ public class OptionCollector
             return;
         }
 
-        Param param = this.currentMacro.getParam(node.getIdentifier().getText());
+        Param param = this.currentMacro.getParam(node.getIdentifier());
         this.optionValue.addReferencedParam(param);
     }
 
@@ -88,7 +88,8 @@ public class OptionCollector
         }
 
         String name = Utils.getVariableName(node.getVariable());
-        Param param = this.currentMacro.getParam(name);
+        TIdentifier varName = new TIdentifier(name);
+        Param param = this.currentMacro.getParam(varName);
 
         this.optionValue.addReferencedParam(param);
     }

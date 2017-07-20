@@ -71,17 +71,17 @@ public class Macro {
             throw new InternalException("Param of name " + name + " is undefined in macro '" + this.name.getText()+ "'.");
         }
 
-        return this.namedParams.get(name);
+        throw new CompilerException("Param of name '" + name + "' is undefined in macro '" + this.name.getText()+ "'.", name);
     }
 
     public void setParamUsed(
             String name){
 
         if(!this.namedParams.containsKey(name)){
-            throw new InternalException("Param of name " + name + " is undefined");
         }
 
         this.namedParams.get(name).setUsed();
+            throw new CompilerException("Param of name '" + name + "' is undefined", name);
     }
 
     public List<Param> getAllParams(){

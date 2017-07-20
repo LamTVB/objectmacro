@@ -1,5 +1,6 @@
 package org.sablecc;
 
+import org.sablecc.objectmacro.exception.CompilerException;
 import org.sablecc.objectmacro.structure.GlobalIndex;
 import org.sablecc.objectmacro.syntax3.lexer.LexerException;
 import org.sablecc.objectmacro.syntax3.node.Start;
@@ -33,6 +34,8 @@ public class ObjectMacro{
             tree.apply(new DefinitionCollector(globalIndex));
             tree.apply(new OptionCollector(globalIndex));
             tree.apply(new VarVerifier(globalIndex));
+
+
         }
         catch (ParserException e) {
             e.printStackTrace();
@@ -45,6 +48,8 @@ public class ObjectMacro{
         }
         catch (LexerException e) {
             e.printStackTrace();
+        }catch(CompilerException e){
+            System.out.println(e.getMessage());
         }
     }
 }

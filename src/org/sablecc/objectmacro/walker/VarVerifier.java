@@ -1,6 +1,6 @@
 package org.sablecc.objectmacro.walker;
 
-import org.sablecc.objectmacro.exception.InternalException;
+import org.sablecc.objectmacro.exception.CompilerException;
 import org.sablecc.objectmacro.structure.GlobalIndex;
 import org.sablecc.objectmacro.structure.Macro;
 import org.sablecc.objectmacro.structure.Param;
@@ -41,7 +41,7 @@ public class VarVerifier
     public void inAMacro(
             AMacro node) {
 
-        this.currentMacro = this.globalIndex.getMacro(node.getName().getText());
+        this.currentMacro = this.globalIndex.getMacro(node.getName());
     }
 
     @Override
@@ -63,14 +63,14 @@ public class VarVerifier
     public void caseAMacroCallMacroReference(
             AMacroCallMacroReference node) {
 
-        this.tempMacro = this.globalIndex.getMacro(node.getIdentifier().getText());
+        this.tempMacro = this.globalIndex.getMacro(node.getIdentifier());
     }
 
     @Override
     public void caseANameMacroReference(
             ANameMacroReference node) {
 
-        this.tempMacro = this.globalIndex.getMacro(node.getIdentifier().getText());
+        this.tempMacro = this.globalIndex.getMacro(node.getIdentifier());
     }
 
     @Override
@@ -78,15 +78,16 @@ public class VarVerifier
             AVarMacroBodyPart node) {
 
         String paramName = Utils.getVariableName(node.getVariable());
-        Param param = this.currentMacro.getParam(paramName);
-        this.currentMacro.setParamUsed(param.getName().getText());
+        TIdentifier varName = new TIdentifier(paramName);
+
+        this.currentMacro.setParamUsed(varName);
     }
 
     @Override
     public void inAParam(
             AParam node) {
 
-        this.currentParam = this.currentMacro.getParam(node.getName().getText());
+        this.currentParam = this.currentMacro.getParam(node.getName());
     }
 
     @Override
@@ -110,9 +111,9 @@ public class VarVerifier
             Macro referencedMacro = getMacroReference(macro_reference_node);
 
             if(referencedMacro == this.currentMacro){
-                throw new InternalException("Cannot self reference macro");
+                throw new CompilerException("Cannot self reference macro", node.getName());
             }else if(referencedMacro.isUsing(this.currentMacro)) {
-                throw new InternalException("Cyclic reference of macros");
+                throw new CompilerException("Cyclic reference of macros", node.getName());
             }
         }
     }

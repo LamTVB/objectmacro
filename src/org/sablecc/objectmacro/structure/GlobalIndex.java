@@ -1,5 +1,6 @@
 package org.sablecc.objectmacro.structure;
 
+import org.sablecc.objectmacro.exception.CompilerException;
 import org.sablecc.objectmacro.exception.InternalException;
 import org.sablecc.objectmacro.syntax3.node.AMacro;
 import org.sablecc.objectmacro.syntax3.node.TIdentifier;
@@ -19,7 +20,7 @@ public class GlobalIndex {
             String name){
 
         if(name == null){
-            throw new InternalException("name cannot be null");
+            throw new InternalException("Name must not be null");
         }
 
         return this.macrosMap.get(name);
@@ -29,14 +30,14 @@ public class GlobalIndex {
             AMacro node){
 
         if(node == null){
-            throw new InternalException("macro node cannot be null ");
+            throw new InternalException("Macro must not be null.");
         }
 
         TIdentifier name = node.getName();
 
         Macro firstMacro = getMacroOrNull(name.getText());
         if(firstMacro != null){
-            throw new InternalException("Macro of name " + firstMacro.getName().getText() + " is already created");
+            throw new CompilerException("Macro of name '" + firstMacro.getName().getText() + "' is already defined.", node.getName());
         }
 
         Macro newMacro = new Macro(this, node.getName());
@@ -47,15 +48,16 @@ public class GlobalIndex {
     }
 
     public Macro getMacro(
-            String macroName){
+            TIdentifier macroName){
 
         if(macroName == null){
             throw new InternalException("Name must not be null");
         }
 
-        Macro macro = this.getMacroOrNull(macroName);
+        String stringName = macroName.getText();
+        Macro macro = this.getMacroOrNull(stringName);
         if(macro == null){
-            throw new InternalException("Macro '" + macroName + "' is undefined");
+            throw new CompilerException("Macro '" + stringName + "' is undefined", macroName);
         }
 
         return macro;
