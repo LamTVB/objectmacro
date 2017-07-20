@@ -91,8 +91,8 @@ public class Macro {
     public boolean isUsing(
             Macro macro){
 
-        for(Param parameter : macro.getAllParams()){
-            if(parameter.getMacroReference(this.getName().getText()) != null){
+        for(Param parameter : this.getAllParams()){
+            if(parameter.getMacroReference(macro.getName().getText()) != null){
                 return true;
             }
         }
