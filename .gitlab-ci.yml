@@ -13,7 +13,7 @@ test_wih_examples:
   script :
     - wget https://downloads.sourceforge.net/project/sablecc/SableCC/3.7/sablecc-3.7.zip
     - unzip sablecc-3.7.zip
-    - java -jar sablecc-3.7/lib/sablecc.jar grammars/objectmacro.sablecc
+    - java -jar sablecc-3.7/lib/sablecc.jar grammars/objectmacro.sablecc -d src
     - mkdir out/
     - javac -sourcepath src -d out/ src/org/sablecc/ObjectMacro.java
     - cd out
