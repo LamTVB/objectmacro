@@ -3,7 +3,17 @@ before_script :
 
 test3.7:
   image : openjdk
-  script:
-  - wget https://downloads.sourceforge.net/project/sablecc/SableCC/3.7/sablecc-3.7.zip
-  - unzip sablecc-3.7.zip
-  - java -jar sablecc-3.7/lib/sablecc.jar grammars/objectmacro.sablecc
+  script :
+    - wget https://downloads.sourceforge.net/project/sablecc/SableCC/3.7/sablecc-3.7.zip
+    - unzip sablecc-3.7.zip
+    - java -jar sablecc-3.7/lib/sablecc.jar grammars/objectmacro.sablecc
+
+test_wih_examples:
+  image : openjdk
+  script :
+    - wget https://downloads.sourceforge.net/project/sablecc/SableCC/3.7/sablecc-3.7.zip
+    - unzip sablecc-3.7.zip
+    - java -jar sablecc-3.7/lib/sablecc.jar grammars/objectmacro.sablecc
+    - javac -sourcepath src -d out/ src/org/sablecc/ObjectMacro.java
+    - cd out
+    - java -cp . org.sablecc.ObjectMacro ../example2.objectmacro
