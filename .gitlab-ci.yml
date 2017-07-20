@@ -6,4 +6,4 @@ test3.7:
   script:
   - wget https://downloads.sourceforge.net/project/sablecc/SableCC/3.7/sablecc-3.7.zip
   - unzip sablecc-3.7.zip
-  - java -jar sablecc-3.7/lib/sablecc.jar objectmacro.sablecc
+  - java -jar sablecc-3.7/lib/sablecc.jar grammars/objectmacro.sablecc
