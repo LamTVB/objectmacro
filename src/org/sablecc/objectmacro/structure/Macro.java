@@ -1,6 +1,6 @@
 package org.sablecc.objectmacro.structure;
 
-import org.sablecc.objectmacro.exception.InternalException;
+import org.sablecc.objectmacro.exception.CompilerException;
 import org.sablecc.objectmacro.syntax3.node.*;
 
 import java.util.*;
@@ -16,9 +16,11 @@ public class Macro {
 
     private List<Param> allParams = new LinkedList<>();
 
-    private SortedMap<String, Param> namedParams = new TreeMap<>();
+    private Map<String, Param> namedParams = new LinkedHashMap<>();
 
-    private Map<TIdentifier, Param> namedContext = new HashMap<>();
+    private List<Param> allContexts = new LinkedList<>();
+
+    private Map<String, Param> namedContexts = new LinkedHashMap<>();
 
     private List<Insert> inserts = new LinkedList<>();
 
@@ -35,6 +37,10 @@ public class Macro {
 
         Param newParam = new Param(this.globalIndex, name);
 
+        if(containsKeyInContexts(name) || containsKeyInParams(name)){
+            throw new CompilerException(
+                    "Parameter '" + name.getText() + "' is already defined in '" + getName().getText() + "'", name);
+        }
         this.namedParams.put(name.getText(), newParam);
         this.allParams.add(newParam);
 
@@ -45,7 +51,13 @@ public class Macro {
             TIdentifier name){
 
         Param newContext = new Param(this.globalIndex, name);
-        this.namedContext.put(name, newContext);
+
+        if(containsKeyInContexts(name) || containsKeyInParams(name)){
+            throw new CompilerException(
+                    "Parameter '" + name.getText() + "' is already defined in '" + getName().getText() + "'", name);
+        }
+        this.allContexts.add(newContext);
+        this.namedContexts.put(name.getText(), newContext);
 
         return newContext;
     }
@@ -65,23 +77,32 @@ public class Macro {
     }
 
     public Param getParam(
-            String name){
+            TIdentifier name){
 
-        if(!this.namedParams.containsKey(name)){
-            throw new InternalException("Param of name " + name + " is undefined in macro '" + this.name.getText()+ "'.");
+        String stringName = name.getText();
+        if(containsKeyInParams(name)){
+            return this.namedParams.get(stringName);
+
+        }else if(containsKeyInContexts(name)){
+            return this.namedContexts.get(stringName);
         }
 
-        throw new CompilerException("Param of name '" + name + "' is undefined in macro '" + this.name.getText()+ "'.", name);
+        throw new CompilerException("Param of name '" + stringName + "' is undefined in macro '" + this.name.getText()+ "'.", name);
     }
 
     public void setParamUsed(
-            String name){
+            TIdentifier name){
 
-        if(!this.namedParams.containsKey(name)){
+        String stringName = name.getText();
+        if(containsKeyInParams(name)){
+            this.namedParams.get(stringName).setUsed();
+
+        }else if(containsKeyInContexts(name)){
+            this.namedContexts.get(stringName).setUsed();
+
+        }else{
+            throw new CompilerException("Param of name '" + stringName + "' is undefined", name);
         }
-
-        this.namedParams.get(name).setUsed();
-            throw new CompilerException("Param of name '" + name + "' is undefined", name);
     }
 
     public List<Param> getAllParams(){
@@ -98,5 +119,17 @@ public class Macro {
         }
 
         return false;
+    }
+
+    public boolean containsKeyInContexts(
+            TIdentifier name){
+
+        return this.namedContexts.containsKey(name.getText());
+    }
+
+    public boolean containsKeyInParams(
+            TIdentifier name){
+
+        return this.namedParams.containsKey(name.getText());
     }
 }

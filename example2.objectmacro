@@ -41,9 +41,9 @@ Macro macro_params_directives
     Params
         year : String;
         presentations : macro_params,
-                       before_first="Persons list",
-                       after_last="This list was generated in {year}.",
-                       none="Nobody is here ! \n";
+                        before_first="Persons list",
+                        after_last="This list was generated in {year}.",
+                        none="Nobody is here ! \n";
 {Begin}
     {presentations}
     {year}
@@ -51,8 +51,13 @@ Macro macro_params_directives
 
 # ========== Ignore macro into ignore macro==========
 
-Start Ignoring
 Macro attribute
+    Params
+        type : macro_params,
+               macro_params_directives,
+               before_first="class {name}";
+        name : String;
+
 {Begin}
     class toto{
         int i = 1;
@@ -60,19 +65,19 @@ Macro attribute
     private {type} {name};
     {Insert: getter_setter(name, type)}
     {Insert : macro_params}
-    {type }
+    {lala}
 {End}
-Start Ignoring
+
 Macro getter_setter
     #Petit commentaire par ici
-     Context
+    Params
+        name : String;
+    Context
         name : String;
         type : String;
 {Begin}
     public {type} {name}();
 {End}
-Stop Ignoring
-Stop Ignoring
 
 # ========== Ignore macro with comments in macro definition ==========
 
