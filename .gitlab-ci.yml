@@ -15,4 +15,5 @@ test_wih_examples:
     - unzip sablecc-3.7.zip
     - java -jar sablecc-3.7/lib/sablecc.jar grammars/objectmacro.sablecc -d src
     - javac -sourcepath src src/org/sablecc/ObjectMacro.java
-    - java -cp . org.sablecc.ObjectMacro example2.objectmacro
+    - cd src
+    - java -cp . org.sablecc.ObjectMacro ../example2.objectmacro
