@@ -63,6 +63,10 @@ public class DeclarationCollector
         if (node.getIgnoreMacroStart().getPos() > 1) {
             throw new CompilerException("'Start Ignoring' must start at the beginning of the line", node.getIgnoreMacroStart());
         }
+
+        if(node.getIgnoreMacroEnd().getPos() > 1){
+            throw new CompilerException("'Stop Ignoring' must start at the beginning of the line", node.getIgnoreMacroEnd());
+        }
         //TODO get macros ignored
     }
 

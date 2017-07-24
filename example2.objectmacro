@@ -65,13 +65,10 @@ Macro attribute
     private {type} {name};
     {Insert: getter_setter(name, type)}
     {Insert : macro_params}
-    {lala}
 {End}
 
 Macro getter_setter
     #Petit commentaire par ici
-    Params
-        name : String;
     Context
         name : String;
         type : String;

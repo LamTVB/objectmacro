@@ -27,29 +27,14 @@ public class ObjectMacro{
                                             new FileReader(args[0]), 1024)));
             // Parse the input.
             Start tree = p.parse();
-//            Printer printer = new Printer();
-//            printer.print(tree);
             GlobalIndex globalIndex = new GlobalIndex();
             tree.apply(new DeclarationCollector(globalIndex));
             tree.apply(new DefinitionCollector(globalIndex));
             tree.apply(new OptionCollector(globalIndex));
             tree.apply(new VarVerifier(globalIndex));
-
-
         }
-        catch (ParserException e) {
+        catch (ParserException | IOException | CompilerException | LexerException e) {
             e.printStackTrace();
-        }
-        catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        catch (IOException e) {
-            e.printStackTrace();
-        }
-        catch (LexerException e) {
-            e.printStackTrace();
-        }catch(CompilerException e){
-            System.out.println(e.getMessage());
         }
     }
 }
