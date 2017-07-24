@@ -1,5 +1,6 @@
 package org.sablecc.objectmacro.walker;
 
+import org.sablecc.objectmacro.exception.CompilerException;
 import org.sablecc.objectmacro.structure.GlobalIndex;
 import org.sablecc.objectmacro.structure.Macro;
 import org.sablecc.objectmacro.structure.Param;
@@ -55,26 +56,32 @@ public class DefinitionCollector
     }
 
     @Override
-    public void caseAMacroCallMacroReference(
-            AMacroCallMacroReference node) {
+    public void caseAMacrosType(AMacrosType node) {
 
-        //To avoid verifying anything else than a parameter definition
-        if (this.currentParam == null) {
-            return;
+        for(PMacroReference pMacroReference : node.getMacroReference()){
+
+            if(pMacroReference instanceof ANameMacroReference){
+                ANameMacroReference aNameMacroReference = (ANameMacroReference) pMacroReference;
+                this.currentParam.addMacroReference(aNameMacroReference.getIdentifier());
+
+            }else if(pMacroReference instanceof AMacroCallMacroReference){
+                AMacroCallMacroReference aMacroCallMacroReference = (AMacroCallMacroReference) pMacroReference;
+
+                Macro referencedMacro = this.globalIndex.getMacro(aMacroCallMacroReference.getIdentifier());
+                if(referencedMacro.getAllContexts().size() == 0){
+                    throw new CompilerException("Cannot call a macro without any context", aMacroCallMacroReference.getIdentifier());
+                }
+
+                this.currentParam.addMacroReference(aMacroCallMacroReference.getIdentifier());
+            }
+
         }
-
-        this.currentParam.addMacroReference(node.getIdentifier());
     }
 
     @Override
-    public void caseANameMacroReference(
-            ANameMacroReference node) {
+    public void caseAStringType(
+            AStringType node) {
 
-        //To avoid verifying anything else than a parameter definition
-        if (this.currentParam == null) {
-            return;
-        }
-
-        this.currentParam.addMacroReference(node.getIdentifier());
+        this.currentParam.setString();
     }
 }

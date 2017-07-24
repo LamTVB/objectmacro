@@ -24,6 +24,8 @@ public class Param {
 
     private boolean isUsed;
 
+    private boolean isString;
+
     public Param(
             GlobalIndex globalIndex,
             TIdentifier name) {
@@ -80,6 +82,9 @@ public class Param {
         if(this.macroReferencesName.containsKey(name)){
             throw new CompilerException(
                     "This parameter already references macro of name '" + macroName + "'", macroName);
+        }else if(this.isString){
+            throw new CompilerException(
+                    "Cannot reference a macro with a string", macroName);
         }
 
         Macro macro = this.globalIndex.getMacro(macroName);
@@ -93,4 +98,16 @@ public class Param {
 
         return this.macroReferencesName.get(macroName);
     }
+
+    public boolean isString(){
+
+        return this.isString;
+    }
+
+    public void setString(){
+
+        this.isString = true;
+    }
+
+
 }

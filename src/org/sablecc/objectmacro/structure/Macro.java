@@ -132,4 +132,9 @@ public class Macro {
 
         return this.namedParams.containsKey(name.getText());
     }
+
+    public List<Param> getAllContexts(){
+
+        return this.allContexts;
+    }
 }
