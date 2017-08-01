@@ -2,8 +2,7 @@ package org.sablecc.objectmacro.structure;
 
 import org.sablecc.objectmacro.exception.CompilerException;
 import org.sablecc.objectmacro.exception.InternalException;
-import org.sablecc.objectmacro.syntax3.node.AOption;
-import org.sablecc.objectmacro.syntax3.node.TIdentifier;
+import org.sablecc.objectmacro.syntax3.node.*;
 
 import java.util.*;
 
@@ -12,15 +11,19 @@ import java.util.*;
  */
 public class Param {
 
-    private GlobalIndex globalIndex;
+    private final GlobalIndex globalIndex;
+
+    private final AParam declaration;
 
     private TIdentifier name;
 
-    private List<Macro> macroReferences = new LinkedList<>();
+    private List<AMacroReference> macroReferences = new LinkedList<>();
 
-    private Map<String, Macro> macroReferencesName = new HashMap<>();
+    private Map<String, AMacroReference> macroReferencesName = new HashMap<>();
 
-    private Map<String, StaticValue> options = new HashMap<>();
+    private Map<String, Option> options = new HashMap<>();
+
+    private List<Option> allOptions = new LinkedList<>();
 
     private boolean isUsed;
 
@@ -28,38 +31,28 @@ public class Param {
 
     public Param(
             GlobalIndex globalIndex,
-            TIdentifier name) {
+            AParam declaration) {
 
         this.globalIndex = globalIndex;
-        this.name = name;
+        this.name = declaration.getName();
+        this.declaration = declaration;
     }
 
-    public StaticValue newOption(
+    public Option newOption(
             AOption option) {
 
-        String optionName = option.getIdentifier().getText();
+        String optionName = option.getName().getText();
         if (this.options.containsKey(optionName)) {
             throw new CompilerException(
-                    "Directive '" + optionName + "' is already defined for this parameter", option.getIdentifier());
+                    "Directive '" + optionName + "' is already defined for this parameter", option.getName());
         }
 
-        StaticValue newValue = new StaticValue();
+        Option newOption = new Option(option);
         this.options.put(
-                optionName, newValue);
+                optionName, newOption);
+        this.allOptions.add(newOption);
 
-        return newValue;
-    }
-
-    public StaticValue getOptionValue(
-            TIdentifier name){
-
-        if(name == null){
-            throw new InternalException("name cannot be null");
-        }else if(!this.options.containsKey(name)){
-            throw new InternalException("no option of this name");
-        }
-
-        return this.options.get(name);
+        return newOption;
     }
 
     public boolean isUsed() {
@@ -76,27 +69,30 @@ public class Param {
     }
 
     public void addMacroReference(
-            TIdentifier macroName){
+            AMacroReference macroRef){
 
-        String name = macroName.getText();
+        String name = macroRef.getIdentifier().getText();
         if(this.macroReferencesName.containsKey(name)){
             throw new CompilerException(
-                    "This parameter already references macro of name '" + macroName + "'", macroName);
+                    "This parameter already references macro of name '" + name + "'", macroRef.getIdentifier());
         }else if(this.isString){
             throw new CompilerException(
-                    "Cannot reference a macro with a string", macroName);
+                    "Cannot reference a macro with a string", macroRef.getIdentifier());
         }
 
-        Macro macro = this.globalIndex.getMacro(macroName);
-
-        this.macroReferences.add(macro);
-        this.macroReferencesName.put(name, macro);
+        this.macroReferences.add(macroRef);
+        this.macroReferencesName.put(name, macroRef);
     }
 
-    public Macro getMacroReference(
+    public PMacroReference getMacroReference(
             String macroName){
 
         return this.macroReferencesName.get(macroName);
+    }
+
+    public List<AMacroReference> getMacroReferences(){
+
+        return this.macroReferences;
     }
 
     public boolean isString(){
@@ -109,5 +105,13 @@ public class Param {
         this.isString = true;
     }
 
+    public List<Option> getAllOptions(){
 
+        return this.allOptions;
+    }
+
+    public AParam getDeclaration(){
+
+        return this.declaration;
+    }
 }

@@ -33,9 +33,10 @@ public class Macro {
     }
 
     public Param newParam(
-            TIdentifier name){
+            AParam param){
 
-        Param newParam = new Param(this.globalIndex, name);
+        TIdentifier name = param.getName();
+        Param newParam = new Param(this.globalIndex, param);
 
         if(containsKeyInContexts(name) || containsKeyInParams(name)){
             throw new CompilerException(
@@ -48,9 +49,10 @@ public class Macro {
     }
 
     public Param newContext(
-            TIdentifier name){
+            AParam param){
 
-        Param newContext = new Param(this.globalIndex, name);
+        TIdentifier name = param.getName();
+        Param newContext = new Param(this.globalIndex, param);
 
         if(containsKeyInContexts(name) || containsKeyInParams(name)){
             throw new CompilerException(

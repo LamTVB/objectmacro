@@ -7,6 +7,8 @@ import org.sablecc.objectmacro.structure.Param;
 import org.sablecc.objectmacro.syntax3.analysis.DepthFirstAdapter;
 import org.sablecc.objectmacro.syntax3.node.*;
 
+import java.util.List;
+
 /**
  * Created by lam on 10/07/17.
  */
@@ -56,26 +58,28 @@ public class DefinitionCollector
     }
 
     @Override
-    public void caseAMacrosType(AMacrosType node) {
+    public void caseAMacroReference(
+            AMacroReference node) {
 
-        for(PMacroReference pMacroReference : node.getMacroReference()){
+        //In case of Insert in a macro
+        if(this.currentParam == null){
+            return;
+        }
 
-            if(pMacroReference instanceof ANameMacroReference){
-                ANameMacroReference aNameMacroReference = (ANameMacroReference) pMacroReference;
-                this.currentParam.addMacroReference(aNameMacroReference.getIdentifier());
+        Macro referencedMacro = this.globalIndex.getMacro(node.getIdentifier());
+        List<PStaticValue> staticValues = node.getValues();
 
-            }else if(pMacroReference instanceof AMacroCallMacroReference){
-                AMacroCallMacroReference aMacroCallMacroReference = (AMacroCallMacroReference) pMacroReference;
+        if(staticValues.size() > 0 && referencedMacro.getAllContexts().size() == 0){
+            throw new CompilerException(
+                    "Cannot call a macro without any context", node.getIdentifier());
 
-                Macro referencedMacro = this.globalIndex.getMacro(aMacroCallMacroReference.getIdentifier());
-                if(referencedMacro.getAllContexts().size() == 0){
-                    throw new CompilerException("Cannot call a macro without any context", aMacroCallMacroReference.getIdentifier());
-                }
-
-                this.currentParam.addMacroReference(aMacroCallMacroReference.getIdentifier());
-            }
+        }else if(staticValues.size() != referencedMacro.getAllContexts().size()){
+            throw new CompilerException(
+                    "Incorrect number of arguments", node.getIdentifier());
 
         }
+
+        this.currentParam.addMacroReference(node);
     }
 
     @Override

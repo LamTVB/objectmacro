@@ -14,7 +14,7 @@ public class Insert {
 
     private Macro parentMacro;
 
-    private List<StaticValue> values;
+    private List<Option> values;
 
     public Insert(
             Macro referencedMacro,
@@ -38,12 +38,12 @@ public class Insert {
     public void addValue(
             List<Param> referencedParams){
 
-        StaticValue newValue = new StaticValue();
-
-        for(Param param : referencedParams){
-            newValue.addReferencedParam(param);
-        }
-
-        this.values.add(newValue);
+//        Option newValue = new Option();
+//
+//        for(Param param : referencedParams){
+//            newValue.addReferencedParam(param);
+//        }
+//
+//        this.values.add(newValue);
     }
 }

@@ -17,7 +17,7 @@ public class OptionCollector
 
     private Param currentParam;
 
-    private StaticValue optionValue;
+    private Option optionValue;
 
     public OptionCollector(
             GlobalIndex globalIndex){

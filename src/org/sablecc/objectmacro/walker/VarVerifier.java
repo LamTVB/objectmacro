@@ -60,15 +60,8 @@ public class VarVerifier
     }
 
     @Override
-    public void caseAMacroCallMacroReference(
-            AMacroCallMacroReference node) {
-
-        this.tempMacro = this.globalIndex.getMacro(node.getIdentifier());
-    }
-
-    @Override
-    public void caseANameMacroReference(
-            ANameMacroReference node) {
+    public void caseAMacroReference(
+            AMacroReference node) {
 
         this.tempMacro = this.globalIndex.getMacro(node.getIdentifier());
     }
