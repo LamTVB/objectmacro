@@ -40,7 +40,7 @@ public class GlobalIndex {
             throw new CompilerException("Macro of name '" + firstMacro.getName().getText() + "' is already defined.", node.getName());
         }
 
-        Macro newMacro = new Macro(this, node.getName());
+        Macro newMacro = new Macro(this, node);
         this.allMacros.add(newMacro);
         this.macrosMap.put(name.getText(), newMacro);
 
@@ -61,5 +61,10 @@ public class GlobalIndex {
         }
 
         return macro;
+    }
+
+    public List<Macro> getAllMacros(){
+
+        return this.allMacros;
     }
 }

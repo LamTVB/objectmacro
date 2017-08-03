@@ -12,6 +12,8 @@ public class Macro {
 
     private GlobalIndex globalIndex;
 
+    private AMacro declaration;
+
     private TIdentifier name;
 
     private List<Param> allParams = new LinkedList<>();
@@ -24,12 +26,13 @@ public class Macro {
 
     private List<Insert> inserts = new LinkedList<>();
 
-    public Macro(
+    Macro(
             GlobalIndex globalIndex,
-            TIdentifier name){
+            AMacro declaration){
 
         this.globalIndex = globalIndex;
-        this.name = name;
+        this.declaration = declaration;
+        this.name = declaration.getName();
     }
 
     public Param newParam(
@@ -138,5 +141,24 @@ public class Macro {
     public List<Param> getAllContexts(){
 
         return this.allContexts;
+    }
+
+    public AMacro getDeclaration(){
+        return this.declaration;
+    }
+
+    public int nbStringContexts(){
+
+        int nbString = 0;
+
+        for(Param context : this.getAllContexts()){
+            if(context.getDeclaration().getType() instanceof AStringType){
+                nbString++;
+            }
+        }
+
+        return nbString;
+
+
     }
 }
