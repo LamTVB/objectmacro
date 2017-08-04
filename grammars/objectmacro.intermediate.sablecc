@@ -114,7 +114,8 @@ Productions
     text_part {-> text_part }=
         {string} string semicolon {-> New text_part.string(string)} |
         {var} param_insert {-> New text_part.var(param_insert.string)} |
-        {insert} macro_insert {-> New text_part.insert(macro_insert.macro_ref)};
+        {insert} macro_insert {-> New text_part.insert(macro_insert.macro_ref)} |
+        {eol} eol_kw {-> New text_part.eol()};
 
     param_insert {-> string}=
         param_insert_kw assign string {-> string};
@@ -156,7 +157,8 @@ Abstract Syntax Tree
     text_part =
         {string} string |
         {var} [name]:string |
-        {insert} macro_ref;
+        {insert} macro_ref |
+        {eol} ;
 
 
 

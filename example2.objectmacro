@@ -25,6 +25,9 @@ Macro macro_params
     Params
         name : String;
         firstname : String;
+    Context
+        mybane : String;
+        lalala : String;
 {Begin}
 My name is {firstname} {name}.
 {End}
@@ -62,6 +65,7 @@ Macro attribute
     class toto{
         int i = 1;
     }
+    {{{{type}
     private {type} {name};
     {Insert: getter_setter(name, type)}
     {Insert : macro_params}
