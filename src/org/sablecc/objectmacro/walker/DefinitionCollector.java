@@ -73,10 +73,15 @@ public class DefinitionCollector
             throw new CompilerException(
                     "Cannot call a macro without any context", node.getIdentifier());
 
-        }else if(staticValues.size() != referencedMacro.getAllContexts().size()){
-            throw new CompilerException(
-                    "Incorrect number of arguments", node.getIdentifier());
-
+        }else if(staticValues.size() > 0){
+            if(staticValues.size() != referencedMacro.getAllContexts().size()){
+                throw new CompilerException(
+                        "Incorrect number of arguments", node.getIdentifier());
+            }
+            else if(referencedMacro.nbStringContexts() != staticValues.size()){
+                throw new CompilerException(
+                        "Incorrect number of string arguments", node.getIdentifier());
+            }
         }
 
         this.currentParam.addMacroReference(node);
