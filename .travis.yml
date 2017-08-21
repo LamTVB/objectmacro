@@ -3,3 +3,9 @@ install:
   - wget https://downloads.sourceforge.net/project/sablecc/SableCC/3.7/sablecc-3.7.zip
   - unzip sablecc-3.7.zip
   - cp sablecc-3.7/lib/sablecc.jar sablecc.jar
+
+script:
+  - java -jar sablecc.jar grammars/objectmacro.sablecc
+  - java -jar sablecc.jar grammars/objectmacro.intermediate.sablecc
+  - javac -sourcepath src src/org/sablecc/ObjectMacro.java
+  - java -cp . org.sablecc.ObjectMacro example2.objectmacro
