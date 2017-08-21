@@ -13,8 +13,8 @@ build:3.7:
     - unzip sablecc-3.7.zip
     - java -jar sablecc-3.7/lib/sablecc.jar grammars/objectmacro.sablecc
     - java -jar sablecc-3.7/lib/sablecc.jar grammars/objectmacro.intermediate.sablecc
-  artifacs:
-    paths:  
+  artifacts:
+    paths:
       - binaries/
 
 
