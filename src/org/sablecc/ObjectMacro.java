@@ -68,8 +68,8 @@ public class ObjectMacro{
         List<PParam> params = new LinkedList<>();
         List<Param> macro_contexts = macro.getAllContexts();
         List<Param> macro_params = macro.getAllParams();
-        List<PMacroPart> macroParts = new LinkedList<>();
         List<PMacroBodyPart> macroBodyParts = macro.getDeclaration().getMacroBodyParts();
+        List<PMacroPart> macroParts = createMacroBody(macroBodyParts);
 
         for(Param context : macro_contexts){
             params.add(createContext(context));
@@ -79,9 +79,179 @@ public class ObjectMacro{
             params.add(createParam(param));
         }
 
+        return new AMacro(name, params, macroParts);
+    }
+
+    private static AParamParam createParam(
+            Param param){
+
+        List<POption> options = createOptions(param.getAllOptions());
+        TString pName = new TString(param.getDeclaration().getName().getText());
+        PType type = createParamType(param);
+
+        return new AParamParam(pName, type, options);
+    }
+
+    private static PParam createContext(
+            Param param){
+
+        List<POption> options = createOptions(param.getAllOptions());
+        TString pName = new TString(param.getDeclaration().getName().getText());
+        PType type = createParamType(param);
+
+        return new AContextParam(pName, type, options);
+    }
+
+    private static PType createParamType(
+            Param param){
+
+        PType type = null;
+        if(param.getDeclaration().getType() instanceof AStringType){
+            type = new org.sablecc.objectmacro.intermediate.syntax3.node.AStringType();
+
+        }else if(param.getDeclaration().getType() instanceof AMacrosType){
+            List<AMacroReference> macroReferences = param.getMacroReferences();
+            List<AMacroRef> macroRefs = new LinkedList<>();
+
+            for(AMacroReference l_macroRef : macroReferences){
+
+                macroRefs.add(createMacroRef(l_macroRef));
+            }
+
+            type = new AMacroRefsType(macroRefs);
+
+        }
+
+        return type;
+    }
+
+    private static List<POption> createOptions(List<Option> options){
+
+        List<POption> options_node = new LinkedList<>();
+
+        for(Option l_option : options){
+            TString optionName = new TString(l_option.getDeclaration().getName().getText());
+            List<PTextPart> text_parts = createTextParts(l_option.getDeclaration().getParts());
+            AStringValue value = new AStringValue(text_parts);
+            options_node.add(new AOption(optionName, value));
+
+        }
+
+        return options_node;
+    }
+
+    private static List<PValue> createValues(
+            AMacroReference macroReference){
+
+        List<PValue> values = new LinkedList<>();
+        List<PStaticValue> args = macroReference.getValues();
+
+        for(PStaticValue argument : args){
+            if(argument instanceof AStringStaticValue){
+                AStringStaticValue stringStaticValue = (AStringStaticValue) argument;
+                List<PTextPart> text_parts = createTextParts(stringStaticValue.getParts());
+                AStringValue value = new AStringValue(text_parts);
+                values.add(value);
+            }else if(argument instanceof AVarStaticValue){
+                AVarStaticValue aVarStaticValue = (AVarStaticValue) argument;
+                AVarValue value = new AVarValue(
+                        new TString(aVarStaticValue.getIdentifier().getText()));
+                values.add(value);
+            }
+        }
+
+        return values;
+    }
+
+    private static AMacroRef createMacroRef(
+            AMacroReference macroReference){
+
+        List<PValue> values = createValues(macroReference);
+        TString macroRefName = new TString(macroReference.getIdentifier().getText());
+
+        return new AMacroRef(macroRefName, values);
+    }
+
+    private static List<PTextPart> createTextParts(
+            List<PStringPart> stringParts){
+
+        List<PTextPart> text_parts = new LinkedList<>();
+        {
+            StringBuilder text_builder = null;
+            for(PStringPart stringPart : stringParts){
+
+                if(stringPart instanceof AEscapeStringPart){
+
+                    AEscapeStringPart aEscapeStringPart = (AEscapeStringPart) stringPart;
+                    String escape = aEscapeStringPart.getStringEscape().getText();
+
+                    if(escape.equals("{{")){
+
+                        if(text_builder == null){
+                            text_builder = new StringBuilder();
+                        }
+                        text_builder.append("{");
+                    }else if(escape.equals("\\n")){
+
+                        if(text_builder != null){
+                            text_parts.add(
+                                    new AStringTextPart(
+                                            new TString(text_builder.toString())));
+
+                            text_builder = null;
+                        }
+
+                        text_parts.add(new AEolTextPart());
+                    }else{
+                        throw new InternalException("case not handled");
+                    }
+
+                }else if(stringPart instanceof ATextStringPart){
+
+                    if(text_builder == null){
+                        text_builder = new StringBuilder();
+                    }
+
+                    ATextStringPart aTextStringPart = (ATextStringPart) stringPart;
+                    text_builder.append(aTextStringPart.getText().getText());
+
+                }else if(stringPart instanceof AVarStringPart){
+                    AVarStringPart aVarStringPart = (AVarStringPart) stringPart;
+
+                    if(text_builder != null){
+                        text_parts.add(new AStringTextPart(
+                                new TString(text_builder.toString())
+                        ));
+
+                        text_builder = null;
+                    }
+
+                    text_parts.add(new AVarTextPart(
+                            new TString(aVarStringPart.getVariable().getText())));
+                }else {
+                    throw new InternalException("case not handled");
+                }
+            }
+
+            if(text_builder != null){
+                text_parts.add(new AStringTextPart(
+                        new TString(text_builder.toString())
+                ));
+
+            }
+        }
+
+        return text_parts;
+    }
+
+    private static List<PMacroPart> createMacroBody(
+            List<PMacroBodyPart> macroBodyParts){
+
+        List<PMacroPart> macroParts = new LinkedList<>();
         StringBuilder macroBuilder = null;
 
         for(PMacroBodyPart bodyPart : macroBodyParts){
+
             if(bodyPart instanceof AEolMacroBodyPart){
 
                 if(macroBuilder != null){
@@ -95,6 +265,18 @@ public class ObjectMacro{
                 macroParts.add(new AEolMacroPart());
 
             }else if(bodyPart instanceof AEscapeMacroBodyPart){
+
+                AEscapeMacroBodyPart escapeMacroBodyPart = (AEscapeMacroBodyPart) bodyPart;
+
+                if(escapeMacroBodyPart.getTextEscape().getText().equals("{{")){
+                    if(macroBuilder == null){
+                        macroBuilder = new StringBuilder();
+                    }
+
+                    macroBuilder.append("{");
+                }else{
+                    throw new InternalException("case unhandled");
+                }
 
             }else if(bodyPart instanceof AInsertMacroBodyPart){
 
@@ -145,152 +327,6 @@ public class ObjectMacro{
                             new TString(macroBuilder.toString())));
         }
 
-        return new AMacro(name, params, macroParts);
-    }
-
-    private static AParamParam createParam(
-            Param param){
-
-        List<POption> options = createOptions(param.getAllOptions());
-        TString pName = new TString(param.getDeclaration().getName().getText());
-        PType type = createParamType(param);
-
-        return new AParamParam(pName, type, options);
-    }
-
-    private static PParam createContext(
-            Param param){
-
-        List<POption> options = createOptions(param.getAllOptions());
-        TString pName = new TString(param.getDeclaration().getName().getText());
-        PType type = createParamType(param);
-
-        return new AContextParam(pName, type, options);
-    }
-
-    private static List<POption> createOptions(List<Option> options){
-
-        List<POption> options_node = new LinkedList<>();
-
-        for(Option l_option : options){
-            TString optionName = new TString(l_option.getDeclaration().getName().getText());
-            List<PTextPart> text_parts = createTextParts(l_option.getDeclaration().getParts());
-            AStringValue value = new AStringValue(text_parts);
-            options_node.add(new AOption(optionName, value));
-        }
-
-        return options_node;
-    }
-
-    private static PType createParamType(
-            Param param){
-
-        PType type = null;
-        if(param.getDeclaration().getType() instanceof AStringType){
-            type = new org.sablecc.objectmacro.intermediate.syntax3.node.AStringType();
-
-        }else if(param.getDeclaration().getType() instanceof AMacrosType){
-            List<AMacroReference> macroReferences = param.getMacroReferences();
-            List<AMacroRef> macroRefs = new LinkedList<>();
-
-            for(AMacroReference l_macroRef : macroReferences){
-
-                macroRefs.add(createMacroRef(l_macroRef));
-            }
-
-            type = new AMacroRefsType(macroRefs);
-
-        }
-
-        return type;
-    }
-
-    private static List<PValue> createValues(
-            AMacroReference macroReference){
-
-        List<PValue> values = new LinkedList<>();
-        List<PStaticValue> args = macroReference.getValues();
-
-        for(PStaticValue argument : args){
-            if(argument instanceof AStringStaticValue){
-                AStringStaticValue stringStaticValue = (AStringStaticValue) argument;
-                List<PTextPart> text_parts = createTextParts(stringStaticValue.getParts());
-                AStringValue value = new AStringValue(text_parts);
-                values.add(value);
-            }else if(argument instanceof AVarStaticValue){
-                AVarStaticValue aVarStaticValue = (AVarStaticValue) argument;
-                AVarValue value = new AVarValue(
-                        new TString(aVarStaticValue.getIdentifier().getText()));
-                values.add(value);
-            }
-        }
-
-        return values;
-    }
-
-    private static AMacroRef createMacroRef(
-            AMacroReference macroReference){
-
-        List<PValue> values = createValues(macroReference);
-        TString macroRefName = new TString(macroReference.getIdentifier().getText());
-
-        return new AMacroRef(macroRefName, values);
-    }
-
-    private static List<PTextPart> createTextParts(
-            List<PStringPart> stringParts){
-
-        List<PTextPart> text_parts = new LinkedList<>();
-        {
-            StringBuilder text_builder = null;
-            for(PStringPart stringPart : stringParts){
-
-                if(stringPart instanceof AEscapeStringPart){
-
-                    if(text_builder == null){
-                        text_builder = new StringBuilder();
-                    }
-
-                    AEscapeStringPart aEscapeStringPart = (AEscapeStringPart) stringPart;
-                    //TODO escaped string
-                    System.out.println(aEscapeStringPart.getStringEscape().getText());
-//                        optionValue.append(aEscapeStringPart)
-                }else if(stringPart instanceof ATextStringPart){
-
-                    if(text_builder == null){
-                        text_builder = new StringBuilder();
-                    }
-
-                    ATextStringPart aTextStringPart = (ATextStringPart) stringPart;
-                    text_builder.append(aTextStringPart.getText().getText());
-
-                }else if(stringPart instanceof AVarStringPart){
-                    AVarStringPart aVarStringPart = (AVarStringPart) stringPart;
-
-                    if(text_builder != null){
-                        text_parts.add(new AStringTextPart(
-                                new TString(text_builder.toString())
-                        ));
-
-                        text_builder = null;
-                    }
-
-                    text_parts.add(new AVarTextPart(
-                            new TString(aVarStringPart.getVariable().getText())));
-                }else {
-                    throw new InternalException("case not handled");
-                }
-            }
-
-            if(text_builder != null){
-                text_parts.add(new AStringTextPart(
-                        new TString(text_builder.toString())
-                ));
-
-                text_builder = null;
-            }
-        }
-
-        return text_parts;
+        return macroParts;
     }
 }
