@@ -15,13 +15,14 @@ build:3.7:
     - java -jar sablecc-3.7/lib/sablecc.jar grammars/objectmacro.intermediate.sablecc
   artifacts:
     paths:
-      - binaries/
+      - /
 
 
 test_wih_examples 3.7:
   stage: test
   image: openjdk
   script:
+    - ls /
     - javac -sourcepath src src/org/sablecc/ObjectMacro.java
     - cd src
     - java -cp . org.sablecc.ObjectMacro ../example2.objectmacro
