@@ -1,19 +1,24 @@
 before_script :
 - apt-get update
 
-test3.7:
+stages:
+  - build
+  - test
+
+build3.7:
+  stage : build
   image : openjdk
   script :
     - wget https://downloads.sourceforge.net/project/sablecc/SableCC/3.7/sablecc-3.7.zip
     - unzip sablecc-3.7.zip
     - java -jar sablecc-3.7/lib/sablecc.jar grammars/objectmacro.sablecc
+    - java -jar sablecc-3.7/lib/sablecc.jar grammars/objectmacro.intermediate.sablecc
+
 
 test_wih_examples:
+  stage : test
   image : openjdk
   script :
-    - wget https://downloads.sourceforge.net/project/sablecc/SableCC/3.7/sablecc-3.7.zip
-    - unzip sablecc-3.7.zip
-    - java -jar sablecc-3.7/lib/sablecc.jar grammars/objectmacro.sablecc -d src
     - javac -sourcepath src src/org/sablecc/ObjectMacro.java
     - cd src
     - java -cp . org.sablecc.ObjectMacro ../example2.objectmacro
