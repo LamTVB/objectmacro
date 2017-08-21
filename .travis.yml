@@ -1,1 +1,5 @@
 language: java
+install:
+  - wget https://downloads.sourceforge.net/project/sablecc/SableCC/3.7/sablecc-3.7.zip
+  - unzip sablecc-3.7.zip
+  - cp sablecc-3.7/lib/sablecc.jar
