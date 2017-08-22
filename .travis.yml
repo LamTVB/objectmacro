@@ -5,8 +5,7 @@ install:
   - cp sablecc-3.7/lib/sablecc.jar sablecc.jar
 
 script:
-  - java -jar sablecc.jar grammars/objectmacro.sablecc
-  - java -jar sablecc.jar grammars/objectmacro.intermediate.sablecc
-  - ls src/org/sablecc/intermediate/syntax3/
+  - java -jar sablecc.jar grammars/objectmacro.sablecc -d src
+  - java -jar sablecc.jar grammars/objectmacro.intermediate.sablecc -d src
   - javac -sourcepath src src/org/sablecc/ObjectMacro.java
   - java -cp . org.sablecc.ObjectMacro example2.objectmacro

@@ -8,7 +8,6 @@ import org.sablecc.objectmacro.intermediate.syntax3.node.AOption;
 import org.sablecc.objectmacro.intermediate.syntax3.node.POption;
 import org.sablecc.objectmacro.intermediate.syntax3.node.PParam;
 import org.sablecc.objectmacro.intermediate.syntax3.node.PType;
-import org.sablecc.objectmacro.intermediate.walker.CodeGenerator;
 import org.sablecc.objectmacro.structure.GlobalIndex;
 import org.sablecc.objectmacro.structure.Macro;
 import org.sablecc.objectmacro.structure.Option;
