@@ -8,4 +8,5 @@ script:
   - java -jar sablecc.jar grammars/objectmacro.sablecc -d src
   - java -jar sablecc.jar grammars/objectmacro.intermediate.sablecc -d src
   - javac -sourcepath src src/org/sablecc/ObjectMacro.java
+  - cd src
   - java -cp . org.sablecc.ObjectMacro example2.objectmacro
