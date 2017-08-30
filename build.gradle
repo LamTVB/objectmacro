@@ -42,7 +42,7 @@ import org.gradle.api.GradleException
 def libDir = "lib"
 
 task downloadSablecc(type: Download){
-    File sablecc = file("lib/sablecc-3.7.zip")
+    File sablecc = file("${libDir}/sablecc-3.7.zip")
     if(!sablecc.exists()) {
         src 'https://downloads.sourceforge.net/project/sablecc/SableCC/3.7/sablecc-3.7.zip'
         dest file('lib')
@@ -59,12 +59,12 @@ task unzipSablecc(type: Copy, dependsOn: downloadSablecc){
 }
 
 task sableccJar(type : Copy, dependsOn: unzipSablecc){
-    from "lib/sablecc-3.7/lib/sablecc.jar"
+    from "${libDir}/sablecc-3.7/lib/sablecc.jar"
     into libDir
 
     doLast{
-        delete "lib/sablecc-3.7"
-        delete "lib/sablecc-3.7.zip"
+        delete "${libDir}/sablecc-3.7"
+        delete "${libDir}/sablecc-3.7.zip"
     }
 }
 
