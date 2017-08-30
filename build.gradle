@@ -41,9 +41,6 @@ import org.gradle.api.GradleException
 
 def libDir = "lib"
 
-task setup{
-}
-
 task downloadSablecc(type: Download){
     File sablecc = file("lib/sablecc-3.7.zip")
     if(!sablecc.exists()) {
@@ -123,9 +120,9 @@ task copyDats(type: Copy){
 
 //Relations between tasks to setup the env
 
-setup.dependsOn sableccJar
-setup.dependsOn generateIntermediateAST
-setup.dependsOn generateObjectMacroAST
+compileJava.dependsOn sableccJar
+compileJava.dependsOn generateIntermediateAST
+compileJava.dependsOn generateObjectMacroAST
 generateIntermediateAST.mustRunAfter sableccJar
 generateObjectMacroAST.mustRunAfter sableccJar
 

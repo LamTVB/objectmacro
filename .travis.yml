@@ -8,11 +8,9 @@ cache:
     - $HOME/.gradle/caches/
     - $HOME/.gradle/wrapper/
 
-install:
-  - ./gradlew check
-  - ./gradlew setup
-
 script:
+  - ./gradlew check
+  - ./gradlew build
   - ./gradlew run -PmacroFile = example2.objectmacro
 
 
