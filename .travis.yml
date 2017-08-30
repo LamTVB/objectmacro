@@ -1,12 +1,18 @@
 language: java
+
+before_cache:
+  - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
+  - rm -fr $HOME/.gradle/caches/*/plugin-resolution/
+cache:
+  directories:
+    - $HOME/.gradle/caches/
+    - $HOME/.gradle/wrapper/
+
 install:
-  - wget https://downloads.sourceforge.net/project/sablecc/SableCC/3.7/sablecc-3.7.zip
-  - unzip sablecc-3.7.zip
-  - cp sablecc-3.7/lib/sablecc.jar sablecc.jar
+  - ./gradlew check
+  - ./gradlew setup
 
 script:
-  - java -jar sablecc.jar grammars/objectmacro.sablecc -d src
-  - java -jar sablecc.jar grammars/objectmacro.intermediate.sablecc -d src
-  - javac -sourcepath src src/org/sablecc/ObjectMacro.java
-  - cd src
-  - java -cp . org.sablecc.ObjectMacro ../example2.objectmacro
+  - ./gradlew run -PmacroFile = example2.objectmacro
+
+
