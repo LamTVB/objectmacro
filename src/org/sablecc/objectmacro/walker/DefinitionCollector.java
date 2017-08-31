@@ -61,30 +61,11 @@ public class DefinitionCollector
     public void caseAMacroReference(
             AMacroReference node) {
 
-        //In case of Insert in a macro
-        if(this.currentParam == null){
-            return;
+        this.globalIndex.checkArgsMacroReference(node);
+
+        if(this.currentParam != null){
+            this.currentParam.addMacroReference(node);
         }
-
-        Macro referencedMacro = this.globalIndex.getMacro(node.getIdentifier());
-        List<PStaticValue> staticValues = node.getValues();
-
-        if(staticValues.size() > 0 && referencedMacro.getAllContexts().size() == 0){
-            throw new CompilerException(
-                    "Cannot call a macro without any context", node.getIdentifier());
-
-        }else if(staticValues.size() > 0){
-            if(staticValues.size() != referencedMacro.getAllContexts().size()){
-                throw new CompilerException(
-                        "Incorrect number of arguments", node.getIdentifier());
-            }
-            else if(referencedMacro.nbStringContexts() != staticValues.size()){
-                throw new CompilerException(
-                        "Incorrect number of string arguments", node.getIdentifier());
-            }
-        }
-
-        this.currentParam.addMacroReference(node);
     }
 
     @Override

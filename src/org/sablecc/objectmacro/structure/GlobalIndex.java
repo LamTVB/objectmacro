@@ -3,6 +3,8 @@ package org.sablecc.objectmacro.structure;
 import org.sablecc.objectmacro.exception.CompilerException;
 import org.sablecc.objectmacro.exception.InternalException;
 import org.sablecc.objectmacro.syntax3.node.AMacro;
+import org.sablecc.objectmacro.syntax3.node.AMacroReference;
+import org.sablecc.objectmacro.syntax3.node.PStaticValue;
 import org.sablecc.objectmacro.syntax3.node.TIdentifier;
 
 import java.util.*;
@@ -30,14 +32,16 @@ public class GlobalIndex {
             AMacro node){
 
         if(node == null){
-            throw new InternalException("Macro must not be null.");
+            throw new InternalException("MacroTest must not be null.");
         }
 
         TIdentifier name = node.getName();
 
         Macro firstMacro = getMacroOrNull(name.getText());
         if(firstMacro != null){
-            throw new CompilerException("Macro of name '" + firstMacro.getName().getText() + "' is already defined.", node.getName());
+            throw new CompilerException(
+                    "MacroTest of name '" + firstMacro.getName().getText()
+                            + "' is already defined.", node.getName());
         }
 
         Macro newMacro = new Macro(this, node);
@@ -57,7 +61,7 @@ public class GlobalIndex {
         String stringName = macroName.getText();
         Macro macro = this.getMacroOrNull(stringName);
         if(macro == null){
-            throw new CompilerException("Macro '" + stringName + "' is undefined", macroName);
+            throw new CompilerException("MacroTest '" + stringName + "' is undefined", macroName);
         }
 
         return macro;
@@ -66,5 +70,26 @@ public class GlobalIndex {
     public List<Macro> getAllMacros(){
 
         return this.allMacros;
+    }
+
+    public void checkArgsMacroReference(AMacroReference node){
+
+        Macro referencedMacro = this.getMacro(node.getIdentifier());
+        List<PStaticValue> staticValues = node.getValues();
+
+        if(staticValues.size() > 0 && referencedMacro.getAllContexts().size() == 0){
+            throw new CompilerException(
+                    "Cannot call a macro without any context", node.getIdentifier());
+
+        }else if(staticValues.size() > 0){
+            if(staticValues.size() != referencedMacro.getAllContexts().size()){
+                throw new CompilerException(
+                        "Incorrect number of arguments", node.getIdentifier());
+            }
+            else if(referencedMacro.nbStringContexts() != staticValues.size()){
+                throw new CompilerException(
+                        "Incorrect number of string arguments", node.getIdentifier());
+            }
+        }
     }
 }

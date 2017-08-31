@@ -1,6 +1,7 @@
 package org.sablecc.objectmacro.structure;
 
 import org.sablecc.objectmacro.exception.CompilerException;
+import org.sablecc.objectmacro.exception.InternalException;
 import org.sablecc.objectmacro.syntax3.node.*;
 
 import java.util.*;
@@ -114,11 +115,31 @@ public class Macro {
         return this.allParams;
     }
 
+    public List<Insert> getInserts() { return this.inserts; }
+
     public boolean isUsing(
             Macro macro){
 
-        for(Param parameter : this.getAllParams()){
+        return isReferencedInParams(macro) || isReferencedInInserts(macro);
+    }
+
+    private boolean isReferencedInParams(
+            Macro macro){
+
+        for(Param parameter : getAllParams()){
             if(parameter.getMacroReference(macro.getName().getText()) != null){
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    private boolean isReferencedInInserts(
+            Macro macro){
+
+        for(Insert insert : getInserts()){
+            if(insert.getReferencedMacro() == macro){
                 return true;
             }
         }
@@ -134,6 +155,10 @@ public class Macro {
 
     public boolean containsKeyInParams(
             TIdentifier name){
+
+        if(name == null){
+            throw new InternalException("Name should not be null");
+        }
 
         return this.namedParams.containsKey(name.getText());
     }

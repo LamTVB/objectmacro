@@ -71,6 +71,10 @@ public class Param {
     public void addMacroReference(
             AMacroReference macroRef){
 
+        if(macroRef == null){
+            throw new InternalException("Macro reference cannot be null");
+        }
+
         String name = macroRef.getIdentifier().getText();
         if(this.macroReferencesName.containsKey(name)){
             throw new CompilerException(

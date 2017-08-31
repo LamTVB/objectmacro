@@ -3,7 +3,6 @@ package org.sablecc.objectmacro.walker;
 import org.sablecc.objectmacro.exception.CompilerException;
 import org.sablecc.objectmacro.structure.GlobalIndex;
 import org.sablecc.objectmacro.structure.Macro;
-import org.sablecc.objectmacro.structure.Param;
 import org.sablecc.objectmacro.syntax3.analysis.DepthFirstAdapter;
 import org.sablecc.objectmacro.syntax3.node.*;
 import org.sablecc.objectmacro.util.Utils;
@@ -17,8 +16,6 @@ public class VarVerifier
     private final GlobalIndex globalIndex;
 
     private Macro currentMacro;
-
-    private Param currentParam;
 
     private Macro tempMacro = null;
 
@@ -56,6 +53,13 @@ public class VarVerifier
             AInsertMacroBodyPart node) {
 
         Macro referencedMacro = getMacroReference(node.getMacroReference());
+
+        if(referencedMacro == this.currentMacro){
+            throw new CompilerException("Cannot self reference macro", node.getInsertCommand());
+        }else if(referencedMacro.isUsing(this.currentMacro)) {
+            throw new CompilerException("Cyclic reference of macros", node.getInsertCommand());
+        }
+
         this.currentMacro.newInsert(referencedMacro);
     }
 
@@ -74,20 +78,6 @@ public class VarVerifier
         TIdentifier varName = new TIdentifier(paramName);
 
         this.currentMacro.setParamUsed(varName);
-    }
-
-    @Override
-    public void inAParam(
-            AParam node) {
-
-        this.currentParam = this.currentMacro.getParam(node.getName());
-    }
-
-    @Override
-    public void outAParam(
-            AParam node) {
-
-        this.currentParam = null;
     }
 
     @Override
@@ -110,4 +100,5 @@ public class VarVerifier
             }
         }
     }
+
 }
