@@ -121,7 +121,7 @@ task copyDats(type: Copy){
 task checkSablecc(dependsOn: check){
     def sableccFile = file("lib/sablecc.jar")
 
-    if(!sableccFile.exist()){
+    if(!sableccFile.exists()){
         dependsOn copyJar
     }
 }
