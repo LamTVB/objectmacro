@@ -9,7 +9,7 @@ cache:
     - $HOME/.gradle/wrapper/
 
 script:
-  - ./gradlew build
+  - ./gradlew check
   - ./gradlew run -PmacroFile = example2.objectmacro
 
 
