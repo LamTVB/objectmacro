@@ -93,7 +93,7 @@ task run(type: JavaExec){
     args = [buildDir, "org.sablecc.ObjectMacro"]
 
     if(project.hasProperty("macroFile")){
-        args[2] = project.getProperty("macroFile");
+        args.push(project.getProperty("macroFile"))
     }
 }
 
