@@ -58,7 +58,7 @@ task unzipSablecc(type: Copy, dependsOn: downloadSablecc){
     into libDir
 }
 
-task sableccJar(type : Copy, dependsOn: unzipSablecc){
+task copyJar(type: Copy, dependsOn: unzipSablecc){
     from "${libDir}/sablecc-3.7/lib/sablecc.jar"
     into libDir
 
@@ -120,12 +120,18 @@ task copyDats(type: Copy){
 
 //Relations between tasks to setup the env
 
-compileJava.dependsOn sableccJar
 compileJava.dependsOn generateIntermediateAST
 compileJava.dependsOn generateObjectMacroAST
-generateIntermediateAST.mustRunAfter sableccJar
-generateObjectMacroAST.mustRunAfter sableccJar
 
 //Relations between tasks to compile and run objectmacro
 
 build.finalizedBy(copyDats)
+
+check << {
+    def sableccFile = file("lib/sablecc.jar")
+
+    if(!sableccFile.exist()){
+        dependsOn copyJar
+    }
+}
+
