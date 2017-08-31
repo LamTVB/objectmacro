@@ -10,6 +10,6 @@ cache:
 
 script:
   - ./gradlew check
-  - ./gradlew run -PmacroFile = example2.objectmacro
+  - ./gradlew run -PmacroFile=example2.objectmacro
 
 

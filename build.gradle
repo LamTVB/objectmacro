@@ -118,16 +118,7 @@ task copyDats(type: Copy){
     }
 }
 
-//Relations between tasks to setup the env
-
-compileJava.dependsOn generateIntermediateAST
-compileJava.dependsOn generateObjectMacroAST
-
-//Relations between tasks to compile and run objectmacro
-
-build.finalizedBy(copyDats)
-
-check << {
+task checkSablecc(dependsOn: check){
     def sableccFile = file("lib/sablecc.jar")
 
     if(!sableccFile.exist()){
@@ -135,3 +126,13 @@ check << {
     }
 }
 
+//Relations between tasks to setup the env
+
+compileJava.dependsOn generateIntermediateAST
+compileJava.dependsOn generateObjectMacroAST
+generateObjectMacroAST.mustRunAfter checkSablecc
+generateIntermediateAST.mustRunAfter checkSablecc
+
+//Relations between tasks to compile and run objectmacro
+
+build.finalizedBy(copyDats)
