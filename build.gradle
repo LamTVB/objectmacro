@@ -96,8 +96,6 @@ task run(type: JavaExec){
         args = [buildDir,
                 "org.sablecc.ObjectMacro",
                 project.findProperty("macroFile")]
-    }else{
-        throw new GradleException("Missing macro path file")
     }
 }
 
