@@ -13,26 +13,15 @@ public class NodeFactory {
 
     public static AMacro createSimpleMacroWithoutBody(String name){
 
-        List<PParam> params = new LinkedList<>();
-        List<PParam> contexts = new LinkedList<>();
-
-        for(Integer i = 0; i < 3; i++){
-            params.add(createStringParam("param".concat(i.toString())));
-        }
-
-        for(Integer i = 0; i < 3; i++){
-            contexts.add(createStringParam("context".concat(i.toString())));
-        }
-
         return new AMacro(
                 new TMacroKw(0,0),
                 new TIdentifier(name, 0 ,0),
-                params,
-                contexts,
+                new LinkedList<>(),
+                new LinkedList<>(),
                 new TBegin(0,0), new LinkedList<>());
     }
 
-    private static AParam createStringParam(String paramName){
+    public static AParam createStringParam(String paramName){
 
         AParam param = new AParam();
         param.setName(new TIdentifier(paramName));

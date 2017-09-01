@@ -86,6 +86,7 @@ public class Param {
 
         this.macroReferences.add(macroRef);
         this.macroReferencesName.put(name, macroRef);
+
     }
 
     public PMacroReference getMacroReference(
