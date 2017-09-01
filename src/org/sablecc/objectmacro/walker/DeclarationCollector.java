@@ -30,8 +30,6 @@ public class DeclarationCollector
 
     private final GlobalIndex globalIndex;
 
-    private Macro currentMacro;
-
     public void visit(Node node) {
 
         node.apply(this);
@@ -81,7 +79,7 @@ public class DeclarationCollector
         if(node.getIgnoreMacroEnd().getPos() > 1){
             throw new CompilerException("'Stop Ignoring' must start at the beginning of the line", node.getIgnoreMacroEnd());
         }
-        //TODO get macros ignored
-    }
 
+        //TODO get macros name ignored
+    }
 }

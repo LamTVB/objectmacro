@@ -2,10 +2,7 @@ package org.sablecc.objectmacro.structure;
 
 import org.sablecc.objectmacro.exception.CompilerException;
 import org.sablecc.objectmacro.exception.InternalException;
-import org.sablecc.objectmacro.syntax3.node.AMacro;
-import org.sablecc.objectmacro.syntax3.node.AMacroReference;
-import org.sablecc.objectmacro.syntax3.node.PStaticValue;
-import org.sablecc.objectmacro.syntax3.node.TIdentifier;
+import org.sablecc.objectmacro.syntax3.node.*;
 
 import java.util.*;
 
@@ -72,7 +69,8 @@ public class GlobalIndex {
         return this.allMacros;
     }
 
-    public void checkArgsMacroReference(AMacroReference node){
+    public void checkArgsMacroReference(
+            AMacroReference node){
 
         Macro referencedMacro = this.getMacro(node.getIdentifier());
         List<PStaticValue> staticValues = node.getValues();
@@ -90,6 +88,18 @@ public class GlobalIndex {
                 throw new CompilerException(
                         "Incorrect number of string arguments", node.getIdentifier());
             }
+        }
+    }
+
+    public void checkReferencedMacro(
+            Macro macro,
+            Macro referencedMacro,
+            Token error){
+
+        if(referencedMacro == macro){
+            throw new CompilerException("Cannot self reference macro", error);
+        }else if(referencedMacro.isUsing(macro)) {
+            throw new CompilerException("Cyclic reference of macros", error);
         }
     }
 }

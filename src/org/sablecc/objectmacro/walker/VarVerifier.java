@@ -54,11 +54,8 @@ public class VarVerifier
 
         Macro referencedMacro = getMacroReference(node.getMacroReference());
 
-        if(referencedMacro == this.currentMacro){
-            throw new CompilerException("Cannot self reference macro", node.getInsertCommand());
-        }else if(referencedMacro.isUsing(this.currentMacro)) {
-            throw new CompilerException("Cyclic reference of macros", node.getInsertCommand());
-        }
+        this.globalIndex.checkReferencedMacro(
+                this.currentMacro, referencedMacro, node.getInsertCommand());
 
         this.currentMacro.newInsert(referencedMacro);
     }
@@ -93,11 +90,8 @@ public class VarVerifier
         for(PMacroReference macro_reference_node : macros.getMacroReference()){
             Macro referencedMacro = getMacroReference(macro_reference_node);
 
-            if(referencedMacro == this.currentMacro){
-                throw new CompilerException("Cannot self reference macro", node.getName());
-            }else if(referencedMacro.isUsing(this.currentMacro)) {
-                throw new CompilerException("Cyclic reference of macros", node.getName());
-            }
+            this.globalIndex.checkReferencedMacro(
+                    this.currentMacro, referencedMacro, node.getName());
         }
     }
 
