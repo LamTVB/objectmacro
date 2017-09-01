@@ -33,6 +33,9 @@ public class ObjectMacro{
 
         try
         {
+            if (args.length == 0) {
+                throw new InternalException("Missing arguments to run ObjectMacro");
+            }
             // Create a Parser instance.
             Parser p =
                     new Parser(
