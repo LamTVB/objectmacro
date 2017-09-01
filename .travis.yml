@@ -11,6 +11,7 @@ cache:
 script:
   - ./gradlew check
   - ./gradlew build
+  - ./gradlew test
   - ./gradlew run -PmacroFile=example2.objectmacro
 
 

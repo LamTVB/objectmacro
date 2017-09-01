@@ -29,6 +29,11 @@ sourceSets{
             srcDirs = ['src']
         }
     }
+    test{
+        java{
+            srcDirs = ["src/test"]
+        }
+    }
 }
 
 jar {
@@ -88,7 +93,7 @@ task generateIntermediateAST(type : JavaExec) {
     ]
 }
 
-task run(type: JavaExec){
+task run(type: JavaExec, dependsOn: build){
     main = "-cp"
     args = [buildDir, "org.sablecc.ObjectMacro"]
 

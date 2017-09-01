@@ -201,12 +201,14 @@ Productions
         {macro} macro;
 
     ignore_macro
-        {-> ignore_macro} =
-        ignore_macro_start source_file ignore_macro_end {-> New ignore_macro(ignore_macro_start, ignore_macro_end)};
+            {-> ignore_macro} =
+        ignore_macro_start source_file ignore_macro_end
+            {-> New ignore_macro(
+                ignore_macro_start, ignore_macro_end)};
 
     macro =
         macro_definition macro_body
-        {-> New macro(macro_definition.macro_kw, macro_definition.identifier,
+            {-> New macro(macro_definition.macro_kw, macro_definition.identifier,
         [macro_definition.params], [macro_definition.contexts],
                   macro_body.begin, [macro_body.macro_body_parts])};
 
@@ -221,7 +223,8 @@ Productions
         {eol} eol |
         {escape} text_escape;
 
-    macro_definition {-> macro_kw identifier [params]:param* [contexts]:param* } =
+    macro_definition
+            {-> macro_kw identifier [params]:param* [contexts]:param* } =
         macro_kw identifier macro_parameters {-> macro_kw identifier [macro_parameters.params] [macro_parameters.contexts] };
 
     macro_parameters {-> [params]:param* [contexts]:param*} =
